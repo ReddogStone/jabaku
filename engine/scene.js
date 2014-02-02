@@ -202,7 +202,7 @@ Scene.extends(Object, {
 		}
 		FrameProfiler.stop();
 
-		this.geometrySystem.run(this._entities, params);
+		this.geometrySystem.run(this._entities, params, view);
 		this.textSystem.run(this._entities, params);
 	}
 });

@@ -11,7 +11,7 @@ Material.extends(Object, {
 });
 
 function SimpleMaterial(engine, texture, color, luminosity) {
-	Material.call(this, engine, 'simple', BlendMode.PREMUL_ALPHA);
+	Material.call(this, engine, 'simple', BlendMode.SOLID);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
 	this._luminosity = luminosity || 0;
