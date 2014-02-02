@@ -190,7 +190,8 @@ Scene.extends(Object, {
 		var params = {
 			uView: view.val,
 			uProjection: projection.val,
-			uScreenSize: [bufferSize.x, bufferSize.y]
+			uScreenSize: [bufferSize.x, bufferSize.y],
+			uPosCamera: camEntity.transformable.pos.toArray()
 		};
 		if (this._pointLight1) {
 			params.uPosLight1 = this._pointLight1.pos.toArray();

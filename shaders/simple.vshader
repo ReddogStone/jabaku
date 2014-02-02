@@ -19,5 +19,5 @@ void main() {
 	
 	vWorldPos = worldPos.xyz;
 	vTexCoord = aTexCoord;
-	vNormal = normalize((uWorldIT * vec4(aNormal, 1.0)).xyz);
+	vNormal = (uWorldIT * vec4(aNormal, 1.0)).xyz;
 }
