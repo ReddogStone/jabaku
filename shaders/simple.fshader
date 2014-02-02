@@ -17,8 +17,8 @@ void main() {
 	
 	vec3 toLight1 = normalize(uPosLight1 - vWorldPos);
 	vec3 toLight2 = normalize(uPosLight2 - vWorldPos);
-	vec3 light1 = uColorLight1 * clamp(dot(toLight1, vNormal), 0.0, 1.0);
-	vec3 light2 = uColorLight2 * clamp(dot(toLight2, vNormal), 0.0, 1.0);
+	vec3 light1 = uColorLight1 * dot(toLight1, vNormal);
+	vec3 light2 = uColorLight2 * dot(toLight2, vNormal);
 
 	textureColor.rgb *= (light1 + light2) * uColor.rgb * uColor.a;
 	textureColor.rgb += uColor.rgb * uLuminosity * textureColor.a * uColor.a;

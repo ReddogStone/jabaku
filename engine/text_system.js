@@ -145,8 +145,8 @@ var Jabaku = (function(module) {
 						 0.5 * size.x, size.y,  su, 0.0],
 					"indices": [0, 1, 2, 2, 1, 3],
 					"description": {
-						"aPosition": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 4 * 4, "offset": 0 },
-						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 4 * 4, "offset": 2 * 4 }
+						"aPosition": { "components": 2, "type": "FLOAT", "normalized": false },
+						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false }
 					}
 				}
 			];
@@ -178,8 +178,8 @@ var Jabaku = (function(module) {
 						size.x, size.y, 0.0,  su, 0.0],
 					"indices": [0, 1, 2, 2, 1, 3],
 					"description": {
-						"aPosition": { "components": 3, "type": "FLOAT", "normalized": false, "stride": 5 * 4, "offset": 0 },
-						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false, "stride": 5 * 4, "offset": 3 * 4 }
+						"aPosition": { "components": 3, "type": "FLOAT", "normalized": false },
+						"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false }
 					}
 				}
 			];
@@ -189,46 +189,20 @@ var Jabaku = (function(module) {
 
 	function TextSystem(engine) {
 		this._engine = engine;
-		this._texts = [];
-		this._ids = [];
-		this._idToIndex = {};
-		this._currentId = 0;
+		this._texts = new Jabaku.IdContainer();
 	}
 	TextSystem.extends(Object, {
-		_newId: function() {
-			return this._currentId++;
+		addText: function(text, font, color) {
+			return this._texts.add(new Text(this._engine, text, font, color));
 		},
-		_get: function(id) {
-			var index = this._idToIndex[id];
-			return this._texts[index];
-		},
-		_add: function(value) {
-			this._texts.push(value);
-			var id = this._newId();
-			this._ids.push(id);
-			this._idToIndex[id] = this._texts.length - 1;
-			return id;
-		},
-		_remove: function(id) {
-			var index = this._idToIndex[id];
-			var lastIndex = this._texts.length - 1;
-			var lastId = this._ids[lastIndex];
-			this._texts[index] = this._texts[lastIndex];
-			this._ids[index] = this._ids[lastIndex];
-			delete this._idToIndex[id];
-			this._idToIndex[lastId] = index;
-		},
-		createText: function(text, font, color) {
-			return this._add(new Text(this._engine, text, font, color));
-		},
-		createScreenText: function(text, font, color) {
-			return this._add(new ScreenText(this._engine, text, font, color));
+		addScreenText: function(text, font, color) {
+			return this._texts.add(new ScreenText(this._engine, text, font, color));
 		},
 		remove: function(id) {
-			this._remove(id);
+			this._texts.remove(id);
 		},
 		setText: function(id, text) {
-			var textComponent = this._get(id);
+			var textComponent = this._texts.get(id);
 			textComponent.text = text;
 		},
 		run: function(entities, globalParams) {
@@ -236,7 +210,7 @@ var Jabaku = (function(module) {
 				var entity = entities[i];
 
 				if ((entity.text !== undefined) && !entity.invisible) {
-					var textComponent = this._get(entity.text);
+					var textComponent = this._texts.get(entity.text);
 					textComponent.prepare(this._engine);
 
 					if (entity.transformable) {

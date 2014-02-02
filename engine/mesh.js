@@ -6,7 +6,20 @@ function MeshPart() {
 	this._description = {};
 }
 MeshPart.extends(Object, {
+	_calcDescription: function() {
+		var description = this._description;
+		var componentCount = 0;
+		for (var name in description) {
+			var attributeDesc = description[name];
+			attributeDesc.offset = componentCount * 4;
+			componentCount += attributeDesc.components;
+		}
+		for (var name in description) {
+			description[name].stride = componentCount * 4;
+		}
+	},	
 	createBuffers: function(engine) {
+		this._calcDescription();
 		this._vb = engine.createVertexBuffer(this._vertices);
 		this._ib = engine.createIndexBuffer(this._indices);
 	},

@@ -29,6 +29,7 @@ function Scene(engine) {
 	this._pointLight2 = null;
 
 	this.textSystem = new Jabaku.TextSystem(engine);
+	this.geometrySystem = new Jabaku.GeometrySystem(engine);
 }
 Scene.extends(Object, {
 	get pointLight1() {
@@ -201,6 +202,7 @@ Scene.extends(Object, {
 		}
 		FrameProfiler.stop();
 
+		this.geometrySystem.run(this._entities, params);
 		this.textSystem.run(this._entities, params);
 	}
 });

@@ -7,6 +7,7 @@ varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 
 uniform mat4 uWorld;
+uniform mat4 uWorldIT;
 uniform mat4 uView;
 uniform mat4 uProjection;
 
@@ -18,5 +19,5 @@ void main() {
 	
 	vWorldPos = worldPos.xyz;
 	vTexCoord = aTexCoord;
-	vNormal = aNormal;
+	vNormal = normalize((uWorldIT * vec4(aNormal, 1.0)).xyz);
 }
