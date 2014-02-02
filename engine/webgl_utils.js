@@ -1,7 +1,7 @@
 'use strict';
 
 var WebGL = (function() {
-	var ENABLE_DEBUG = false;
+	var ENABLE_DEBUG = true;
 
 	/**
 	 * Creates a webgl context.

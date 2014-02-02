@@ -22,10 +22,13 @@ Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
 
-function Scene() {
+function Scene(engine) {
+	this._engine = engine;
 	this._entities = [];
 	this._pointLight1 = null;
 	this._pointLight2 = null;
+
+	this.textSystem = new Jabaku.TextSystem(engine);
 }
 Scene.extends(Object, {
 	get pointLight1() {
@@ -53,7 +56,7 @@ Scene.extends(Object, {
 		this._entities.remove(entity);
 	},
 	render: function(engine, viewport, camEntity) {
-		function arraysEqual(a1, a2) {
+/*		function arraysEqual(a1, a2) {
 			var l = a2.length;
 			for (var i = 0; i < l; ++i) {
 				if (a1[i] != a2[i]) {
@@ -164,16 +167,40 @@ Scene.extends(Object, {
 				if (lastProgram != program) {
 					engine.setProgram(program, params);
 					lastProgram = program;
-					lastParams = cloneParams(params);
 				} else {
 					var diff = paramDiff(lastParams, params);
-					lastParams = cloneParams(params);
 					engine.setProgramParameters(diff);
 				}
+				lastParams = cloneParams(params);
 				
 				renderable.render(engine);
 			}
 		}
+		FrameProfiler.stop();*/
+
+		FrameProfiler.start('GetCameraStuff');
+		var bufferSize = engine.getDrawingBufferSize();
+		var camera = camEntity.camera;
+		var view = camera.getView(camEntity.transformable);
+		var projection = camera.getProjection();
 		FrameProfiler.stop();
+
+		FrameProfiler.start('GatherParams');
+		var params = {
+			uView: view.val,
+			uProjection: projection.val,
+			uScreenSize: [bufferSize.x, bufferSize.y]
+		};
+		if (this._pointLight1) {
+			params.uPosLight1 = this._pointLight1.pos.toArray();
+			params.uColorLight1 = this._pointLight1.color.toArray3();
+		}
+		if (this._pointLight2) {
+			params.uPosLight2 = this._pointLight2.pos.toArray();
+			params.uColorLight2 = this._pointLight2.color.toArray3();
+		}
+		FrameProfiler.stop();
+
+		this.textSystem.run(this._entities, params);
 	}
 });
