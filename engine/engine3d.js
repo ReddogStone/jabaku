@@ -181,7 +181,10 @@ var Engine3D = (function() {
 				break;
 			case 0x8B5E: // SAMPLER_2D
 				var texture = value.texture;
-				if (texture.complete) {
+				if (!texture) {
+					texture = getTexture('empty_texture');
+				}
+				if (texture && texture.complete) {
 					var sampler = value.sampler;
 					gl.activeTexture(gl['TEXTURE' + sampler]);
 					gl.bindTexture(gl.TEXTURE_2D, texture);

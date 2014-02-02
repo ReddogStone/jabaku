@@ -14,7 +14,7 @@ function SimpleMaterial(engine, texture, color, luminosity) {
 	Material.call(this, engine, 'simple', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
-	this._color.alpha = luminosity || 0;
+	this._luminosity = luminosity || 0;
 }
 SimpleMaterial.extends(Material, {
 	get color() {
@@ -24,10 +24,10 @@ SimpleMaterial.extends(Material, {
 		this._color = Color.clone(value);
 	},
 	get luminosity() {
-		return this._color.alpha;
+		return this._luminosity;
 	},
 	set luminosity(value) {
-		this._color.alpha = value;
+		this._luminosity = value;
 	},
 	get texture() {
 		return this._texture;
@@ -35,6 +35,7 @@ SimpleMaterial.extends(Material, {
 	setParams: function(globalParams) {
 		globalParams.uTexture = {texture: this._texture, sampler: 0};
 		globalParams.uColor = this._color.toArray4();
+		globalParams.uLuminosity = this._luminosity;
 	}
 });
 
