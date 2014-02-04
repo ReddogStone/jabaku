@@ -22,11 +22,12 @@ Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
 
-function Scene(engine) {
+function Scene(engine, camSystem) {
 	this._engine = engine;
 	this._entities = [];
 	this._pointLight1 = null;
 	this._pointLight2 = null;
+	this._camSystem = camSystem;
 
 	this.textSystem = new Jabaku.TextSystem(engine);
 	this.geometrySystem = new Jabaku.GeometrySystem(engine);
@@ -181,9 +182,9 @@ Scene.extends(Object, {
 
 		FrameProfiler.start('GetCameraStuff');
 		var bufferSize = engine.getDrawingBufferSize();
-		var camera = camEntity.camera;
-		var view = camera.getView(camEntity.transformable);
-		var projection = camera.getProjection();
+		var camera = this._camSystem.get(camEntity.camera);
+		var view = camera.view;
+		var projection = camera.projection;
 		FrameProfiler.stop();
 
 		FrameProfiler.start('GatherParams');

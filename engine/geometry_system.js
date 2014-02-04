@@ -1,19 +1,8 @@
 var Jabaku = (function(module) {
 	function Geometry(mesh, material) {
-		this._mesh = mesh;
-		this._material = material;
+		this.mesh = mesh;
+		this.material = material;
 	}
-	Geometry.extends(Object, {
-		get material() {
-			return this._material;
-		},
-		setParams: function(globalParams) {
-			this._material.setParams(globalParams);
-		},
-		render: function(engine) {
-			this._mesh.render(engine);
-		}
-	});
 
 	function GeometrySystem(engine) {
 		this._engine = engine;
@@ -71,12 +60,12 @@ var Jabaku = (function(module) {
 					globalParams.uWorld = worldMatrix.val;
 					globalParams.uWorldIT = worldMatrix.clone().invert().transpose().val
 				}
-				geometry.setParams(globalParams);
+				geometry.material.setParams(globalParams);
 				var material = geometry.material;
 				this._engine.setBlendMode(material.blendMode);
 				this._engine.setProgram(material.program, globalParams);
 
-				geometry.render(this._engine);				
+				geometry.mesh.render(this._engine);				
 			}
 		}		
 	});

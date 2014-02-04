@@ -44,5 +44,36 @@ Transformable.extends(Object, {
 	},
 	rotateZ: function(angle) {
 		this._rot.rotateZ(angle);
-	}
+	},
+	rotateAroundTargetVert: function(target, angle) {
+		var targetPos = target.clone();
+		if (targetPos) {
+			var targetToPos = this._pos.clone().sub(targetPos);
+			var dir = targetToPos.clone().normalize();
+			var up = this.up;
+
+			// TODO: implement snapping to the "down" view
+			var dirDotUp = dir.dot(up);
+			if ((Math.abs(dirDotUp) < 0.99) || ((dirDotUp * angle) > 0)) {
+				var right = up.clone().cross(dir).normalize();
+				var rotation = new Vecmath.Quaternion().setAxisAngle(right, angle);
+				this._pos = targetPos.add(targetToPos.transformQuat(rotation));
+			}
+		}
+	},
+	rotateAroundTargetHoriz: function(target, angle) {
+		var targetPos = target.clone();
+		if (targetPos) {
+			var targetToPos = this._pos.clone().sub(targetPos);
+			var dir = targetToPos.clone().normalize();
+
+			var up = this.up;
+			var right = up.clone().cross(dir);
+			angle *= right.length();
+			right.normalize();
+			up = dir.clone().cross(right).normalize();
+			var rotation = new Vecmath.Quaternion().setAxisAngle(up, angle);
+			this._pos = targetPos.add(targetToPos.transformQuat(rotation));
+		}
+	}	
 });
