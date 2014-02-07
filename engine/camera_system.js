@@ -5,16 +5,20 @@ var Jabaku = (function(module) {
 		this.target = null;
 	}
 
-	function CameraSystem() {
+	function CameraSystem(transformSystem) {
 		this._cameras = new Jabaku.IdContainer();
+		this._transformSystem = transformSystem;
 	}
 	CameraSystem.extends(Object, {
-		addPerspective: function(fov, aspect, nearPlane, farPlane) {
+		addPerspective: function(id, fov, aspect, nearPlane, farPlane) {
 			var projection = new Vecmath.Matrix4().perspective(fov, aspect, nearPlane, farPlane);
-			return this._cameras.add(new Camera(projection));
+			return this._cameras.add(id, new Camera(projection));
 		},
 		get: function(id) {
 			return this._cameras.get(id);
+		},
+		remove: function(id) {
+			this._cameras.remove(id);
 		},
 		getTarget: function(id) {
 			return this._cameras.get(id).target;
@@ -25,9 +29,9 @@ var Jabaku = (function(module) {
 		run: function(entities) {
 			for (var i = 0; i < entities.length; ++i) {
 				var entity = entities[i];
-				if ((entity.camera !== undefined) && (entity.transformable !== undefined)) {
-					var camera = this._cameras.get(entity.camera);
-					var trans = entity.transformable;
+				var camera = this._cameras.get(entity);
+				var trans = this._transformSystem.get(entity);
+				if ((camera !== undefined) && (trans !== undefined)) {
 					var view = camera.view;
 					if (camera.target) {
 						view.lookAt(trans.pos, camera.target, trans.up);

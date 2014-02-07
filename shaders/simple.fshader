@@ -12,6 +12,7 @@ uniform vec3 uPosLight2;
 uniform vec3 uColorLight2;
 uniform vec4 uColor;
 uniform float uLuminosity;
+uniform vec3 uAmbient;
 
 void main() {
 	vec3 normal = normalize(vNormal);
@@ -31,9 +32,9 @@ void main() {
 	vec3 white = vec3(1.0, 1.0, 1.0);
 
 	vec3 diffuse = diffuse1 + diffuse2;
-	vec3 specular = (specular1/* + specular2*/) * white;
+	vec3 specular = (specular1 + specular2) * white;
 
-	textureColor.rgb *= (specular + diffuse * uColor.rgb) * uColor.a;
+	textureColor.rgb *= (/*specular + */(diffuse + uAmbient) * uColor.rgb) * uColor.a;
 	textureColor.rgb += uColor.rgb * uLuminosity * textureColor.a * uColor.a;
 	textureColor.a = uColor.a;
 	

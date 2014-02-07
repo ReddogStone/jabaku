@@ -1,11 +1,11 @@
 'use strict';
 
-function Transformable(pos, rot, scale) {
+function Transform(pos, rot, scale) {
 	this._pos = pos ? pos.clone() : new Vecmath.Vector3();
 	this._rot = rot ? rot.clone() : new Vecmath.Quaternion().identity();
 	this._scale = scale ? scale.clone() : new Vecmath.Vector3(1, 1, 1);
 }
-Transformable.extends(Object, {
+Transform.extends(Object, {
 	get scale() {
 		return this._scale;
 	},

@@ -187,16 +187,17 @@ var Jabaku = (function(module) {
 		}
 	});
 
-	function TextSystem(engine) {
+	function TextSystem(engine, transformSystem) {
 		this._engine = engine;
 		this._texts = new Jabaku.IdContainer();
+		this._transformSystem = transformSystem;
 	}
 	TextSystem.extends(Object, {
-		addText: function(text, font, color) {
-			return this._texts.add(new Text(this._engine, text, font, color));
+		addText: function(id, text, font, color) {
+			return this._texts.add(id, new Text(this._engine, text, font, color));
 		},
-		addScreenText: function(text, font, color) {
-			return this._texts.add(new ScreenText(this._engine, text, font, color));
+		addScreenText: function(id, text, font, color) {
+			return this._texts.add(id, new ScreenText(this._engine, text, font, color));
 		},
 		remove: function(id) {
 			this._texts.remove(id);
@@ -209,18 +210,19 @@ var Jabaku = (function(module) {
 			for (var i = 0; i < entities.length; ++i) {
 				var entity = entities[i];
 
-				if ((entity.text !== undefined) && !entity.invisible) {
-					var textComponent = this._texts.get(entity.text);
-					textComponent.prepare(this._engine);
+				var text = this._texts.get(entity);
+				if (text !== undefined) {
+					text.prepare(this._engine);
 
-					if (entity.transformable) {
-						globalParams.uWorld = entity.transformable.transform.val;
+					var trans = this._transformSystem.get(entity);
+					if (trans !== undefined) {
+						globalParams.uWorld = trans.transform.val;
 					}
-					textComponent.setParams(globalParams);
+					text.setParams(globalParams);
 					this._engine.setBlendMode(BlendMode.PREMUL_ALPHA);
-					this._engine.setProgram(textComponent.material.program, globalParams);
+					this._engine.setProgram(text.material.program, globalParams);
 
-					textComponent.render(this._engine);
+					text.render(this._engine);
 				}
 			}
 		}

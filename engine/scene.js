@@ -22,15 +22,16 @@ Viewport.clone = function(value) {
 	return new Viewport(value.x, value.y, value.sx, value.sy);
 };
 
-function Scene(engine, camSystem) {
+function Scene(engine) {
 	this._engine = engine;
-	this._entities = [];
 	this._pointLight1 = null;
 	this._pointLight2 = null;
-	this._camSystem = camSystem;
+	this._entitySystem = new Jabaku.EntitySystem();
 
-	this.textSystem = new Jabaku.TextSystem(engine);
-	this.geometrySystem = new Jabaku.GeometrySystem(engine);
+	this.transformSystem = new Jabaku.TransformSystem();
+	this.textSystem = new Jabaku.TextSystem(engine, this.transformSystem);
+	this.geometrySystem = new Jabaku.GeometrySystem(engine, this.transformSystem);
+	this.cameraSystem = new Jabaku.CameraSystem(this.transformSystem);
 }
 Scene.extends(Object, {
 	get pointLight1() {
@@ -51,13 +52,13 @@ Scene.extends(Object, {
 	set camEntity(value) {
 		this._camEntity = value;
 	},
-	addEntity: function(entity) {
-		this._entities.push(entity);
+	addEntity: function() {
+		return this._entitySystem.add();
 	},
-	removeEntity: function(entity) {
-		this._entities.remove(entity);
+	removeEntity: function(id) {
+		this._entitySystem.remove(id);
 	},
-	render: function(engine, viewport, camEntity) {
+	render: function(engine, viewport, camId) {
 /*		function arraysEqual(a1, a2) {
 			var l = a2.length;
 			for (var i = 0; i < l; ++i) {
@@ -182,7 +183,8 @@ Scene.extends(Object, {
 
 		FrameProfiler.start('GetCameraStuff');
 		var bufferSize = engine.getDrawingBufferSize();
-		var camera = this._camSystem.get(camEntity.camera);
+		var camera = this.cameraSystem.get(camId);
+		var camTrans = this.transformSystem.get(camId);
 		var view = camera.view;
 		var projection = camera.projection;
 		FrameProfiler.stop();
@@ -192,8 +194,10 @@ Scene.extends(Object, {
 			uView: view.val,
 			uProjection: projection.val,
 			uScreenSize: [bufferSize.x, bufferSize.y],
-			uPosCamera: camEntity.transformable.pos.toArray()
+			uPosCamera: camTrans.pos.toArray()
 		};
+
+		params.uAmbient = new Float32Array([0.1, 0.1, 0.1]);
 		if (this._pointLight1) {
 			params.uPosLight1 = this._pointLight1.pos.toArray();
 			params.uColorLight1 = this._pointLight1.color.toArray3();
@@ -204,7 +208,7 @@ Scene.extends(Object, {
 		}
 		FrameProfiler.stop();
 
-		this.geometrySystem.run(this._entities, params, view);
-		this.textSystem.run(this._entities, params);
+		this.geometrySystem.run(this._entitySystem.entities, params, view);
+		this.textSystem.run(this._entitySystem.entities, params);
 	}
 });

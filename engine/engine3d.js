@@ -247,13 +247,16 @@ var Engine3D = (function() {
 		if (blendmode === BlendMode.SOLID) {
 			gl.disable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
+			gl.depthMask(true);
 		} else if (blendmode === BlendMode.ALPHA) {
 			gl.enable(gl.BLEND);
-			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthMask(false);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 		} else if (blendmode === BlendMode.PREMUL_ALPHA) {
 			gl.enable(gl.BLEND);
-			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthMask(false);
 			gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		}
 		FrameProfiler.stop();
