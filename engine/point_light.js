@@ -1,9 +1,16 @@
-'use strict';
+var Jabaku = (function(module) {
+	'use strict';
 
-function PointLight(pos, color) {
-	this.pos = pos ? pos.clone() : new Vecmath.Vector3();
-	this.color = Color.clone(color);
-}
-PointLight.clone = function(value) {
-	return new PointLight(value.pos, value.color);
-}
+	function PointLight(pos, color) {
+		this.pos = pos ? pos.clone() : new Vecmath.Vector3();
+		this.color = Color.clone(color);
+	}
+	PointLight.extends(Object, {
+		clone: function() {
+			return new PointLight(this.pos, this.color);
+		}
+	});
+
+	module.PointLight = PointLight;
+	return module;
+})(Jabaku || {});

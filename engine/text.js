@@ -1,4 +1,4 @@
-(function (exports) {
+var Jabaku = (function (module) {
 	'use strict';
 	
 	function Font(family, size, weight, style) {
@@ -53,7 +53,7 @@
 		return value ? new Font(value.family, value.size, value.weight, value.style) : new Font();
 	}
 
-	function TextRenderableBase(engine, text, font, color) {
+	function TextBase(engine, text, font, color) {
 		this._text = text || '';
 		this._font = Font.clone(font) || new Font();
 		this._color = Color.clone(color) || new Color();
@@ -62,7 +62,7 @@
 		canvas.width = canvas.height = 1;
 		this._buffered = false;
 	}
-	TextRenderableBase.extends(Object, {
+	TextBase.extends(Object, {
 		_getSize: function() {
 			var context = this._bufferCanvas.getContext('2d');
 			context.font = this._font.toString();
@@ -93,8 +93,10 @@
 			return this._text;
 		},
 		set text(value) {
-			this._text = value;
-			this._buffered = false;
+			if (value != this._text)  {
+				this._text = value;
+				this._buffered = false;
+			}
 		},
 		prepare: function(engine) {
 			var bufferCanvas = this._bufferCanvas;
@@ -129,12 +131,12 @@
 		}
 	});
 	
-	function TextRenderable(engine, text, font, color, screenOffset) {
-		TextRenderableBase.call(this, engine, text, font, color);
+	function Text(engine, text, font, color, screenOffset) {
+		TextBase.call(this, engine, text, font, color);
 		this.material = new TextMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
 		this._screenOffset = screenOffset ? screenOffset.clone() : new Vecmath.Vector2(0.0, 0.0);
 	}
-	TextRenderable.extends(TextRenderableBase, {
+	Text.extends(TextBase, {
 		_createMesh: function(engine, size, canvasSize) {
 			var su = size.x / canvasSize.x;
 			var sv = size.y / canvasSize.y;
@@ -163,11 +165,11 @@
 		}
 	});
 	
-	function ScreenTextRenderable(engine, text, font, color) {
-		TextRenderableBase.call(this, engine, text, font, color);
+	function ScreenText(engine, text, font, color) {
+		TextBase.call(this, engine, text, font, color);
 		this.material = new ScreenSpaceMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
 	}
-	ScreenTextRenderable.extends(TextRenderableBase, {
+	ScreenText.extends(TextBase, {
 		_createMesh: function(engine, size, canvasSize) {
 			var su = size.x / canvasSize.x;
 			var sv = size.y / canvasSize.y;
@@ -190,7 +192,8 @@
 		}
 	});
 
-	exports.Font = Font;
-	exports.TextRenderable = TextRenderable;
-	exports.ScreenTextRenderable = ScreenTextRenderable;
-})(this);
+	module.Font = Font;
+	module.Text = Text;
+	module.ScreenText = ScreenText;
+	return module;
+})(Jabaku || {});

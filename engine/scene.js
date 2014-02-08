@@ -58,7 +58,7 @@ Scene.extends(Object, {
 	removeEntity: function(id) {
 		this._entitySystem.remove(id);
 	},
-	render: function(engine, viewport, camId) {
+	render: function(viewport, camId) {
 /*		function arraysEqual(a1, a2) {
 			var l = a2.length;
 			for (var i = 0; i < l; ++i) {
@@ -181,21 +181,25 @@ Scene.extends(Object, {
 		}
 		FrameProfiler.stop();*/
 
-		FrameProfiler.start('GetCameraStuff');
-		var bufferSize = engine.getDrawingBufferSize();
-		var camera = this.cameraSystem.get(camId);
-		var camTrans = this.transformSystem.get(camId);
-		var view = camera.view;
-		var projection = camera.projection;
-		FrameProfiler.stop();
 
 		FrameProfiler.start('GatherParams');
+		var bufferSize = this._engine.getDrawingBufferSize();
 		var params = {
-			uView: view.val,
-			uProjection: projection.val,
 			uScreenSize: [bufferSize.x, bufferSize.y],
-			uPosCamera: camTrans.pos.toArray()
 		};
+
+		FrameProfiler.start('GetCameraStuff');
+		var camera = this.cameraSystem.get(camId);
+		var view = new Vecmath.Matrix4();
+		if (camera !== undefined) {
+			var camTrans = this.transformSystem.get(camId);
+			view = camera.view;
+
+			params.uView = view.val;
+			params.uProjection = camera.projection.val;
+			params.uPosCamera = camTrans.pos.toArray();
+		}
+		FrameProfiler.stop();
 
 		params.uAmbient = new Float32Array([0.1, 0.1, 0.1]);
 		if (this._pointLight1) {

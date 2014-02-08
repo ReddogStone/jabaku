@@ -39,6 +39,19 @@ SimpleMaterial.extends(Material, {
 	}
 });
 
+function SimpleInstMaterial(engine, texture) {
+	Material.call(this, engine, 'simple_instanced', BlendMode.PREMUL_ALPHA);
+	this._texture = texture;
+}
+SimpleInstMaterial.extends(Material, {
+	get texture() {
+		return this._texture;
+	},
+	setParams: function(globalParams) {
+		globalParams.uTexture = {texture: this._texture, sampler: 0};
+	}
+});
+
 function ScreenSpaceMaterial(engine, texture, color) {
 	Material.call(this, engine, 'screenspace', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;

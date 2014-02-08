@@ -1,21 +1,23 @@
 var Jabaku = (function(module) {
-	function createQuadMesh(engine) {
-		var meshData = [
-			{
-				"vertices": [
-					//x	   y	z	 nx   ny   nz   tu   tv
-					-0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
-					 0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0,
-					-0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0,
-					 0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
-				"indices": [0, 1, 2, 2, 1, 3],
-				"description": {
-					"aPosition": { "components": 3, "type": "FLOAT", "normalized": false },
-					"aNormal": { "components": 3, "type": "FLOAT", "normalized": false },
-					"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false }
-				}
+	function createQuadData() {
+		return {
+			"vertices": [
+				//x	   y	z	 nx   ny   nz   tu   tv
+				-0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+				 0.5,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0,
+				-0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0,
+				 0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0],
+			"indices": [0, 1, 2, 2, 1, 3],
+			"description": {
+				"aPosition": { "components": 3, "type": "FLOAT", "normalized": false },
+				"aNormal": { "components": 3, "type": "FLOAT", "normalized": false },
+				"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false }
 			}
-		];
+		};
+	}
+
+	function createQuadMesh(engine) {
+		var meshData = [createQuadData()];
 		return Mesh.loadFromJson(engine, meshData);
 	}
 
@@ -73,6 +75,7 @@ var Jabaku = (function(module) {
 		return Mesh.loadFromJson(engine, meshData);
 	}
 
+	module.createQuadData = createQuadData;
 	module.createQuadMesh = createQuadMesh;
 	module.createCubeMesh = createCubeMesh;
 	return module;

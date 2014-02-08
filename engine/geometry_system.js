@@ -1,14 +1,23 @@
 var Jabaku = (function(module) {
+	'use strict';
+	
 	function Geometry(material) {
+		this.material = material;
+
 		this.meshes = [];
 		this.transforms = [];
-		this.material = material;
+
+		this.quadIds = [];
+		this.quadTransforms = [];
 	}
 
 	function GeometrySystem(engine, transformSystem) {
 		this._engine = engine;
 		this._geometries = new Jabaku.IdContainer();
 		this._transformSystem = transformSystem;
+
+		this._quadBatch = new Jabaku.QuadBatch(engine);
+		this._quadBatch.material.blendMode = BlendMode.PREMUL_ALPHA;
 	}
 	GeometrySystem.extends(Object, {
 		setGeometry: function(id, material) {
@@ -20,7 +29,12 @@ var Jabaku = (function(module) {
 			geometry.transforms.push(transform);
   		},
 		addQuad: function(id, transform) {
-			this.addMesh(id, Jabaku.createQuadMesh(this._engine), transform);
+			var geometry = this._geometries.get(id);
+			var material = geometry.material;
+			var trans = transform ? transform.transform : new Vecmath.Matrix4();
+			var id = this._quadBatch.add(trans, material.color, 0, material.luminosity);
+			geometry.quadIds.push(id);
+			geometry.quadTransforms.push(trans.clone());
 		},
 		addCube: function(id, transform) {
 			this.addMesh(id, Jabaku.createCubeMesh(this._engine), transform);
@@ -58,6 +72,7 @@ var Jabaku = (function(module) {
 			});
 			FrameProfiler.stop();
 
+			var engine = this._engine;
 			for (var i = 0; i < geometryEntities.length; ++i) {
 				var entity = geometryEntities[i];
 				var geometry = this._geometries.get(entity.id);
@@ -67,16 +82,17 @@ var Jabaku = (function(module) {
 				if (transform !== undefined) {
 					worldMatrix = transform.transform;
 				}
+
 				geometry.material.setParams(globalParams);
 				var material = geometry.material;
-				this._engine.setBlendMode(material.blendMode);
-				this._engine.setProgram(material.program, globalParams);
+				engine.setBlendMode(material.blendMode);
+				engine.setProgram(material.program, globalParams);
 
 				for (var meshIdx = 0; meshIdx < geometry.meshes.length; ++meshIdx) {
 					var mesh = geometry.meshes[meshIdx];
 					var trans = geometry.transforms[meshIdx];
 
-					globalTrans = worldMatrix.clone();
+					var globalTrans = worldMatrix.clone();
 					if (trans !== undefined) {
 						globalTrans.mul(trans.transform);
 					}
@@ -84,10 +100,23 @@ var Jabaku = (function(module) {
 					var localParams = {};
 					localParams.uWorld = globalTrans.val;
 					localParams.uWorldIT = globalTrans.clone().invert().transpose().val;
-					this._engine.setProgramParameters(localParams);
+					engine.setProgramParameters(localParams);
 					mesh.render(this._engine);
 				}
+
+				for (var quadIdx = 0; quadIdx < geometry.quadIds.length; ++quadIdx) {
+					var quadId = geometry.quadIds[quadIdx];
+					var localTrans = geometry.quadTransforms[quadIdx];
+					var transform = worldMatrix.clone().mul(localTrans);
+					this._quadBatch.setTransform(quadId, transform);
+				}
 			}
+
+			this._quadBatch.prepare(engine);
+			this._quadBatch.setParams(globalParams);				
+			engine.setBlendMode(this._quadBatch.material.blendMode);
+			engine.setProgram(this._quadBatch.material.program, globalParams);
+			this._quadBatch.render(engine);
 		}		
 	});
 
