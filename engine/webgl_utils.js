@@ -127,7 +127,7 @@ var WebGL = (function() {
 		}
 		
 		return program;
-	};
+	}
 
 	/**
 	 * Loads a shader from a string.
@@ -142,7 +142,7 @@ var WebGL = (function() {
 		}
 		
 		return shader;
-	};
+	}
 
 	/**
 	 * Creates a program from 2 files
@@ -153,12 +153,39 @@ var WebGL = (function() {
 			createShader(gl, fragmentShader, gl.FRAGMENT_SHADER)
 		];
 		return loadProgram(gl, shaders);
-	};
+	}
 
+	function createDebugProgram(gl) {
+		var vsText = [
+			"attribute vec2 aPosition;",
+			"attribute vec2 aTexCoord;",
+
+			"varying vec2 vTexCoord;",
+
+			"void main() {",
+			"	vTexCoord = aTexCoord;",
+			"	gl_Position = vec4(aPosition, 0.5, 1.0);",
+			"}"
+		].join('\n');
+		var fsText = [
+			"precision mediump float;",
+
+			"varying vec2 vTexCoord;",
+
+			"uniform sampler2D uTexture;",
+
+			"void main() {",
+			"	gl_FragColor = vec4(texture2D(uTexture, vTexCoord).rgb, 1.0);",
+			"}"
+		].join('\n');
+
+		return createProgram(gl, vsText, fsText);
+	}
 
 	return {
 		createShader: createShader,
 		createProgram: createProgram,
+		createDebugProgram: createDebugProgram,
 		setupWebGL: setupWebGL
 	}
 }());

@@ -10,7 +10,5 @@ void main() {
 	vec4 color = uColor;
 	color.rgb *= color.a;
 
-	float val = textureColor.r;
-
-	gl_FragColor = vec4(val, val, val, textureColor.a);
+	gl_FragColor = textureColor * color;
 }

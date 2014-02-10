@@ -16,6 +16,10 @@ var Engine3D = (function() {
 	var frameBuffers = {};
 	var depthBuffers = {};
 
+	var debugProgram;
+	var debugVb;
+	var debugDesc;
+
 	function init(canvas) {
 		gl = WebGL.setupWebGL(canvas, {antialias: false}, [Extensions.DEPTH_TEXTURE]);
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -23,6 +27,18 @@ var Engine3D = (function() {
 		
 		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 		gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+
+		debugProgram = WebGL.createDebugProgram(gl);
+		debugVb = createVertexBuffer([
+			-1, 1, 0.0, 1.0,
+			 1, 1, 1.0, 1.0,
+			-1,-1, 0.0, 0.0,
+			 1,-1, 1.0, 0.0
+		]);
+		debugDesc = {
+			aPosition: { components: 2, type: 'FLOAT', normalized: false, offset: 0, stride: 4 * 4},
+			aTexCoord: { components: 2, type: 'FLOAT', normalized: false, offset: 2 * 4, stride: 4 * 4}
+		};
 	}
 
 	function createVertexBufferWithSize(sizeInBytes, dynamic) {
@@ -213,8 +229,18 @@ var Engine3D = (function() {
 	}
 
 	function setFrameBuffer(id) {
-		var frameBuffer = id ? (frameBuffers[id] || null) : null;
+		var frameBuffer = null;
+		if (id !== null) {
+			frameBuffer = frameBuffers[id];
+			if (!frameBuffer) {
+				throw new Error('Unknown frame buffer ID: "' + id + '"!');
+			}
+		}
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+	}
+
+	function setDefaultFrameBuffer() {
+		setFrameBuffer(null);
 	}
 
 	function setClearColor(color) {
@@ -226,7 +252,10 @@ var Engine3D = (function() {
 	}
 	
 	function setViewport(value) {
-		gl.viewport(value.x, value.y, value.sx, value.sy);		
+		gl.viewport(value.x, value.y, value.sx, value.sy);
+	}
+	function setDefaultViewport() {
+		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 	}
 	
 	function setMaterialParameter(location, type, value) {
@@ -339,6 +368,7 @@ var Engine3D = (function() {
 			gl.disable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
 			gl.depthMask(true);
+			gl.blendFunc(gl.ONE, gl.ZERO);
 		} else if (blendmode === BlendMode.ALPHA) {
 			gl.enable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
@@ -352,7 +382,8 @@ var Engine3D = (function() {
 		} else if (blendmode === BlendMode.NONE) {
 			gl.disable(gl.BLEND);
 			gl.disable(gl.DEPTH_TEST);
-			gl.depthMask(false);
+			gl.depthMask(true);
+			gl.blendFunc(gl.ONE, gl.ZERO);
 		}
 		FrameProfiler.stop();
 	}
@@ -403,6 +434,10 @@ var Engine3D = (function() {
 		FrameProfiler.stop();
 	}	
 	
+	function getDrawingBufferSize() {
+		return {x: gl.drawingBufferWidth, y: gl.drawingBufferHeight};
+	}
+
 	function clear() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 	}
@@ -412,9 +447,18 @@ var Engine3D = (function() {
 		gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, offset);
 		FrameProfiler.stop();
 	}
-	
-	function getDrawingBufferSize() {
-		return {x: gl.drawingBufferWidth, y: gl.drawingBufferHeight};
+
+	function renderDebugQuad(texture, x, y, sx, sy) {
+		setVertexBuffer(debugVb, debugDesc);
+		setBlendMode(BlendMode.NONE);
+		setViewport({x: x, y: y, sx: sx, sy: sy});
+		setProgram(debugProgram, { uTexture: {texture: texture, sampler: 0} });
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	}
+
+	function renderScreenQuad() {
+		setVertexBuffer(debugVb, debugDesc);
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	}
 	
 	return {
@@ -435,18 +479,22 @@ var Engine3D = (function() {
 		setClearColor: setClearColor,
 		setClearDepth: setClearDepth,
 		setViewport: setViewport,
+		setDefaultViewport: setDefaultViewport,
 		setProgramParameters: setProgramParameters,
 		setProgram: setProgram,
 		setBlendMode: setBlendMode,
 		setBuffers: setBuffers,
 		setVertexBuffer: setVertexBuffer,
+		setFrameBuffer: setFrameBuffer,
+		setDefaultFrameBuffer: setDefaultFrameBuffer,
 		reloadTextureImage: reloadTextureImage,
 		clear: clear,
 		renderTriangles: renderTriangles,
+		renderScreenQuad: renderScreenQuad,
+		renderDebugQuad: renderDebugQuad,
 		getDrawingBufferSize: getDrawingBufferSize,
 		createFrameBuffer: createFrameBuffer,
 		createFrameBufferWithDepthTexture: createFrameBufferWithDepthTexture,
-		setFrameBuffer: setFrameBuffer,
 		get gl() {
 			return gl;
 		}
