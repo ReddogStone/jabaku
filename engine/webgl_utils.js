@@ -1,12 +1,42 @@
 'use strict';
 
+var Extensions = {
+	DEPTH_TEXTURE: {
+		id: 'DEPTH_TEXTURE',
+		names: ['WEBGL_depth_texture', 'WEBKIT_WEBGL_depth_texture']
+	}
+};
+
 var WebGL = (function() {
 	var ENABLE_DEBUG = true;
 
-	/**
-	 * Creates a webgl context.
-	 */
-	function create3DContext(canvas, attributes) {
+	function getExtensions(gl, extensions) {
+		var result = {};
+
+		if (extensions) {
+			for (var i = 0; i < extensions.length; ++i) {
+				var extDesc = extensions[i];
+				var extension;
+				for (var extNameIdx = 0; extNameIdx < extDesc.names.length; ++j) {
+					var extName = extDesc.names[extNameIdx];
+					extension = gl.getExtension(extName);
+					if (extension !== undefined) {
+						break;
+					}
+				}
+
+				if (extension !== undefined) {
+					result[extDesc.id] = extension;
+				} else {
+					console.log('Failed to load "' + extDesc.id + '" extension!');
+				}
+			}
+		}
+
+		return result;
+	}
+
+	function create3DContext(canvas, attributes, extensions) {
 		var names = ["webgl", "experimental-webgl"];
 		var context = null;
 		for (var i = 0; i < names.length; ++i) {
@@ -25,18 +55,20 @@ var WebGL = (function() {
 			throw new Error('Couldn\'t create a WebGL context!');
 		}
 
+		context.extensions = getExtensions(context, extensions);
+
 		return ENABLE_DEBUG ? WebGLDebugUtils.makeDebugContext(context) : context;
 	}
 
 	/**
 	 * Creates a webgl context.
 	 */
-	function setupWebGL(canvas, attributes) {
+	function setupWebGL(canvas, attributes, extensions) {
 		if (!window.WebGLRenderingContext) {
 			throw new Error('Browser doesn\'t support WebGL!');
 		}
 
-		var context = create3DContext(canvas, attributes);
+		var context = create3DContext(canvas, attributes, extensions);
 		if (!context) {
 			throw new Error('Couldn\'t create a WebGL context!');
 		}
