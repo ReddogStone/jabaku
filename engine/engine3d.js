@@ -12,9 +12,11 @@ var Engine3D = (function() {
 	
 	var shaderPrograms = {};
 	var textures = {};
+	var frameBuffers = {};
+	var depthBuffers = {};
 
 	function init(canvas) {
-		gl = WebGL.setupWebGL(canvas);
+		gl = WebGL.setupWebGL(canvas, {antialias: false});
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthFunc(gl.LESS);
@@ -94,7 +96,7 @@ var Engine3D = (function() {
 		
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 		gl.generateMipmap(gl.TEXTURE_2D);
 		
@@ -129,7 +131,56 @@ var Engine3D = (function() {
 		}
 		return result;
 	}
+
+	function createRenderTexture(id, size) {
+		var texture = gl.createTexture();
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 
+			size.x, size.y, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+		gl.bindTexture(gl.TEXTURE_2D, null);
+		
+		texture.complete = true;
+
+		textures[id] = texture;
+		return texture;
+	}
+
+	function createDepthBuffer(id, size) {
+		var depthBuffer = gl.createRenderbuffer();
+		gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, size.x, size.y);
+		gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+
+		depthBuffers[id] = depthBuffer;
+		return depthBuffer;
+	}
 	
+	function createFrameBuffer(id, size) {
+		var frameBuffer = gl.createFramebuffer();
+		frameBuffer.width = size.x;
+		frameBuffer.height = size.y;
+
+		var renderTarget = createRenderTexture(id + '_rt', size);
+		var depthBuffer = createDepthBuffer(id + '_db', size);
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTarget, 0);
+		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+		frameBuffers[id] = frameBuffer;
+		return frameBuffer;
+	}
+
+	function setFrameBuffer(id) {
+		var frameBuffer = id ? (frameBuffers[id] || null) : null;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+	}
+
 	function setClearColor(color) {
 		gl.clearColor(color.red, color.green, color.blue, 1.0);		
 	}
@@ -248,6 +299,7 @@ var Engine3D = (function() {
 			gl.disable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
 			gl.depthMask(true);
+			gl.blendFunc(gl.ONE, gl.ZERO);
 		} else if (blendmode === BlendMode.ALPHA) {
 			gl.enable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
@@ -348,6 +400,8 @@ var Engine3D = (function() {
 		clear: clear,
 		renderTriangles: renderTriangles,
 		getDrawingBufferSize: getDrawingBufferSize,
+		createFrameBuffer: createFrameBuffer,
+		setFrameBuffer: setFrameBuffer,
 		get gl() {
 			return gl;
 		}

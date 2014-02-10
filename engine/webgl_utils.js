@@ -13,11 +13,18 @@ var WebGL = (function() {
 			try {
 				context = canvas.getContext(names[i], attributes);
 			} catch(e) {
+				console.log(e);
+				console.log(e.stack);
 			}
 			if (context) {
 				break;
 			}
 		}
+
+		if (!context) {
+			throw new Error('Couldn\'t create a WebGL context!');
+		}
+
 		return ENABLE_DEBUG ? WebGLDebugUtils.makeDebugContext(context) : context;
 	}
 
