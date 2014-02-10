@@ -13,6 +13,7 @@ varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 varying vec4 vColor;
 varying vec2 vIndexLum;
+varying float vTest;
 
 uniform mat4 uWorldIT;
 uniform mat4 uView;
@@ -25,7 +26,11 @@ void main() {
 	mat4 vp = uProjection * uView;
 	
 	gl_Position = vp * worldPos;
-	
+
+	vec4 testPos = vec4(0.0, 0.0, -6.0, 1.0);
+	testPos = uProjection * testPos;
+	vTest = testPos.z / testPos.w;
+
 	vWorldPos = worldPos.xyz;
 	vTexCoord = aTexCoord;
 	vNormal = (normalMatrix * vec4(aNormal, 1.0)).xyz;

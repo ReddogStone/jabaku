@@ -449,10 +449,10 @@ var Engine3D = (function() {
 	}
 
 	function renderDebugQuad(texture, x, y, sx, sy) {
+		setProgram(debugProgram, { uTexture: {texture: texture, sampler: 0} });
 		setVertexBuffer(debugVb, debugDesc);
 		setBlendMode(BlendMode.NONE);
 		setViewport({x: x, y: y, sx: sx, sy: sy});
-		setProgram(debugProgram, { uTexture: {texture: texture, sampler: 0} });
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	}
 

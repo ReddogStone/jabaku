@@ -41,10 +41,10 @@ void main() {
 	textureColor.a = vColor.a;
 
 	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
-	float myDepth = gl_FragCoord.z;
-/*	if (myDepth < layerDepth) {
+	float myDepth = 0.999 * gl_FragCoord.z;
+	if (myDepth < layerDepth) {
 		discard;
-	} */
+	}
 
 	gl_FragColor = textureColor;
 }

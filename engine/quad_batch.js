@@ -75,6 +75,7 @@ var Jabaku = (function(module) {
 			this._batch.setComponent(id, function(data) { data[21] = value; });
 		},
 
+		// Renderable interface
 		prepare: function(engine) {
 			this._batch.prepare(engine);
 		},

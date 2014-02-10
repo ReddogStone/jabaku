@@ -1,13 +1,18 @@
 var Jabaku = (function(module) {
 	'use strict';
 
-	function SceneSettings() {
+	function ForwardLightSettings() {
 		this._pointLight1 = null;
 		this._pointLight2 = null;
-		this._camera = null;
 		this._ambientColor = Color.clone(Color.black);
 	}
-	SceneSettings.extends(Object, {
+	ForwardLightSettings.extends(Object, {
+		get ambientColor() {
+			return this._ambientColor;
+		},
+		set ambientColor(value) {
+			this._ambientColor = Color.clone(value.clone());
+		},
 		get pointLight1() {
 			return this._pointLight1;
 		},
@@ -20,15 +25,8 @@ var Jabaku = (function(module) {
 		set pointLight2(value) {
 			this._pointLight2 = value ? value.clone() : value;
 		},
-		setParams: function(viewport, camera, params) {
-			FrameProfiler.start('GatherParams');
-			FrameProfiler.start('GetCameraStuff');
-			params.uView = camera.view.val;
-			params.uProjection = camera.projection.val;
-			params.uPosCamera = camera.pos.toArray();
-			FrameProfiler.stop();
-
-			params.uAmbient = new Float32Array([0.1, 0.1, 0.1]);
+		setParams: function(params) {
+			params.uAmbient = this._ambientColor.toArray3();
 			if (this._pointLight1) {
 				params.uPosLight1 = this._pointLight1.pos.toArray();
 				params.uColorLight1 = this._pointLight1.color.toArray3();
@@ -44,10 +42,9 @@ var Jabaku = (function(module) {
 				params.uPosLight2 = [0, 0, 0];
 				params.uColorLight2 = Color.black.toArray3();
 			}
-			FrameProfiler.stop();
 		}
 	});
 
-	module.SceneSettings = SceneSettings;
+	module.ForwardLightSettings = ForwardLightSettings;
 	return module;
 })(Jabaku || {});
