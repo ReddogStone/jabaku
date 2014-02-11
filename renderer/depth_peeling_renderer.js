@@ -12,13 +12,15 @@ var Jabaku = (function(module) {
 		this._rt2 = engine.createRenderTexture('depthPeelingRT2', size);
 		this._rt3 = engine.createRenderTexture('depthPeelingRT3', size);
 		this._rt4 = engine.createRenderTexture('depthPeelingRT4', size);
+
 		this._dt1 = engine.createDepthTexture('depthPeelingDT1', size);
 		this._dt2 = engine.createDepthTexture('depthPeelingDT2', size);
+		this._dt3 = engine.createDepthTexture('depthPeelingDT3', size);
 
 		this._fb1 = engine.createFrameBuffer('depthPeelingFB1', this._rt1, this._dt1);
 		this._fb2 = engine.createFrameBuffer('depthPeelingFB2', this._rt2, this._dt2);
-		this._fb3 = engine.createFrameBuffer('depthPeelingFB3', this._rt3, this._dt1);
-		this._fb4 = engine.createFrameBuffer('depthPeelingFB4', this._rt4, this._dt2);
+		this._fb3 = engine.createFrameBuffer('depthPeelingFB3', this._rt3, this._dt3);
+		this._fb4 = engine.createFrameBuffer('depthPeelingFB4', this._rt4, this._dt1);
 
 		this._finalCombineProgram = Engine3D.createProgram('dp_final_combine',
 			FileUtils.loadFile('jabaku/shaders/pass_through.vshader'),
@@ -92,7 +94,7 @@ var Jabaku = (function(module) {
 
 			this._clearFB('depthPeelingFB4', 1.0);
 			engine.setFrameBuffer('depthPeelingFB4');
-			params.uDepthTexture = {texture: this._dt2, sampler: 1};
+			params.uDepthTexture = {texture: this._dt3, sampler: 1};
 			this._renderObjects(objects, params, {
 				program: engine.getProgram('simple_instanced_dp'),
 				blendMode: BlendMode.SOLID
@@ -113,6 +115,8 @@ var Jabaku = (function(module) {
 			if (this.debugRender) {
 				engine.renderDebugQuad(this._dt1, 0, 0, 200, 200);
 				engine.renderDebugQuad(this._dt2, 200, 0, 200, 200);
+				engine.renderDebugQuad(this._dt3, 400, 0, 200, 200);
+
 				engine.renderDebugQuad(this._rt1, 0, 568, 200, 200);
 				engine.renderDebugQuad(this._rt2, 200, 568, 200, 200);
 				engine.renderDebugQuad(this._rt3, 400, 568, 200, 200);

@@ -18,7 +18,7 @@ uniform vec3 uAmbient;
 
 void main() {
 	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
-	float myDepth = 0.999999 * gl_FragCoord.z;
+	float myDepth = 0.99999 * gl_FragCoord.z - 0.0001;
 	if (myDepth < layerDepth) {
 		discard;
 	}
