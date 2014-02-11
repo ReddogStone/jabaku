@@ -99,6 +99,7 @@ var Engine3D = (function() {
 		var program = WebGL.createProgram(gl, vertexShader, fragmentShader);
 		program._id = id;
 		shaderPrograms[id] = program;
+		return program;
 	}
 	function getProgram(id) {
 		var result = shaderPrograms[id];
@@ -155,13 +156,15 @@ var Engine3D = (function() {
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 
 			size.x, size.y, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 		
 		texture.complete = true;
+		texture.width = size.x;
+		texture.height = size.y;
 
 		textures[id] = texture;
 		return texture;
@@ -173,6 +176,8 @@ var Engine3D = (function() {
 		gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, size.x, size.y);
 		gl.bindRenderbuffer(gl.RENDERBUFFER, null);
 
+		depthBuffer.width = size.x;
+		depthBuffer.height = size.y;
 		depthBuffers[id] = depthBuffer;
 		return depthBuffer;
 	}
@@ -188,42 +193,29 @@ var Engine3D = (function() {
 			size.x, size.y, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_INT, null);
 		gl.bindTexture(gl.TEXTURE_2D, null);
 
+		depthTexture.width = size.x;
+		depthTexture.height = size.y;
 		depthTexture.complete = true;
 
 		textures[id] = depthTexture;
 		return depthTexture;
 	}
 	
-	function createFrameBuffer(id, size) {
+	function createFrameBuffer(id, renderTexture, depthTexture) {
 		var frameBuffer = gl.createFramebuffer();
-		frameBuffer.width = size.x;
-		frameBuffer.height = size.y;
-
-		var renderTarget = createRenderTexture(id + '_rt', size);
-		var depthBuffer = createDepthBuffer(id + '_db', size);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTarget, 0);
-		gl.framebufferRenderbuffer(gl.FRAMEBUFFER, 
-			gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTexture, 0);
 
-		frameBuffers[id] = frameBuffer;
-		return frameBuffer;
-	}
+		if (depthTexture) {
+			gl.framebufferTexture2D(gl.FRAMEBUFFER, 
+				gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
+		} else {
+			var depthBuffer = createDepthBuffer(id + '_db', size);
+			gl.framebufferRenderbuffer(gl.FRAMEBUFFER, 
+				gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
+		}
 
-	function createFrameBufferWithDepthTexture(id, size) {
-		var frameBuffer = gl.createFramebuffer();
-		frameBuffer.width = size.x;
-		frameBuffer.height = size.y;
-
-		var renderTarget = createRenderTexture(id + '_rt', size);
-		var depthTexture = createDepthTexture(id + '_dt', size);
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, renderTarget, 0);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, 
-			gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 		frameBuffers[id] = frameBuffer;
@@ -470,19 +462,26 @@ var Engine3D = (function() {
 	
 	return {
 		init: init,
+
 		createVertexBufferWithSize: createVertexBufferWithSize,
 		createVertexBuffer: createVertexBuffer,
 		createIndexBufferWithSize: createIndexBufferWithSize,
 		createIndexBuffer: createIndexBuffer,
+		createRenderTexture: createRenderTexture,
+		createDepthTexture: createDepthTexture,
+		createFrameBuffer: createFrameBuffer,
+		createProgram: createProgram,
+		createTexture: createTexture,
+		createTextureFromFile: createTextureFromFile,
+
 		changeVertexBufferData: changeVertexBufferData,
 		changeIndexBufferData: changeIndexBufferData,
 		updateVertexBufferData: updateVertexBufferData,
 		updateIndexBufferData: updateIndexBufferData,
-		createProgram: createProgram,
+
 		getProgram: getProgram,
-		createTexture: createTexture,
-		createTextureFromFile: createTextureFromFile,
 		getTexture: getTexture,
+
 		setClearColor: setClearColor,
 		setClearDepth: setClearDepth,
 		setViewport: setViewport,
@@ -494,14 +493,16 @@ var Engine3D = (function() {
 		setVertexBuffer: setVertexBuffer,
 		setFrameBuffer: setFrameBuffer,
 		setDefaultFrameBuffer: setDefaultFrameBuffer,
+
 		reloadTextureImage: reloadTextureImage,
+
 		clear: clear,
+
 		renderTriangles: renderTriangles,
 		renderScreenQuad: renderScreenQuad,
 		renderDebugQuad: renderDebugQuad,
+
 		getDrawingBufferSize: getDrawingBufferSize,
-		createFrameBuffer: createFrameBuffer,
-		createFrameBufferWithDepthTexture: createFrameBufferWithDepthTexture,
 		get gl() {
 			return gl;
 		}

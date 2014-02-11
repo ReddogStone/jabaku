@@ -17,6 +17,12 @@ uniform vec3 uColorLight2;
 uniform vec3 uAmbient;
 
 void main() {
+	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
+	float myDepth = 0.999999 * gl_FragCoord.z;
+	if (myDepth < layerDepth) {
+		discard;
+	}
+
 	vec3 normal = normalize(vNormal);
 	vec4 textureColor = texture2D(uTexture, vTexCoord);
 	
@@ -40,11 +46,6 @@ void main() {
 	textureColor.rgb += vColor.rgb * vIndexLum.y * textureColor.a * vColor.a;
 	textureColor.a = vColor.a;
 
-	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
-	float myDepth = 0.999 * gl_FragCoord.z;
-	if (myDepth < layerDepth) {
-		discard;
-	}
-
-	gl_FragColor = vec4(textureColor.rgb, 1.0 - textureColor.a);
+//	gl_FragColor = vec4(textureColor.rgb, 1.0 - textureColor.a);
+	gl_FragColor = textureColor;
 }
