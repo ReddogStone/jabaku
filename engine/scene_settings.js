@@ -2,10 +2,6 @@ var Jabaku = (function(module) {
 	'use strict';
 
 	function SceneSettings() {
-		this._pointLight1 = null;
-		this._pointLight2 = null;
-		this._camera = null;
-		this._ambientColor = Color.clone(Color.black);
 	}
 	SceneSettings.extends(Object, {
 		get pointLight1() {

@@ -5,6 +5,7 @@ var BlendMode = {
 	ALPHA: {name: 'ALPHA'},
 	PREMUL_ALPHA: {name: 'PREMUL_ALPHA'},
 	NONE: {name: 'NONE'},
+	DEPTH_PEELING: {name: 'DEPTH_PEELING'},
 };
 
 var Engine3D = (function() {
@@ -24,6 +25,7 @@ var Engine3D = (function() {
 		gl = WebGL.setupWebGL(canvas, {antialias: false}, [Extensions.DEPTH_TEXTURE]);
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
+		gl.colorMask(true, true, true, true);
 		
 		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 		gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
@@ -244,7 +246,7 @@ var Engine3D = (function() {
 	}
 
 	function setClearColor(color) {
-		gl.clearColor(color.red, color.green, color.blue, 1.0);		
+		gl.clearColor(color.red, color.green, color.blue, color.alpha);
 	}
 
 	function setClearDepth(value) {
@@ -384,6 +386,11 @@ var Engine3D = (function() {
 			gl.disable(gl.DEPTH_TEST);
 			gl.depthMask(true);
 			gl.blendFunc(gl.ONE, gl.ZERO);
+		} else if (blendmode == BlendMode.DEPTH_PEELING) {
+			gl.enable(gl.BLEND);
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthMask(true);
+			gl.blendFunc(gl.ONE, gl.ONE);
 		}
 		FrameProfiler.stop();
 	}

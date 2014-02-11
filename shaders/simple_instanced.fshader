@@ -40,11 +40,5 @@ void main() {
 	textureColor.rgb += vColor.rgb * vIndexLum.y * textureColor.a * vColor.a;
 	textureColor.a = vColor.a;
 
-	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
-	float myDepth = gl_FragCoord.z;
-/*	if (myDepth < layerDepth) {
-		discard;
-	} */
-
-	gl_FragColor = textureColor;
+	gl_FragColor = vec4(textureColor.rgb, textureColor.a);
 }
