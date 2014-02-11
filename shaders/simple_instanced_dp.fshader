@@ -18,7 +18,7 @@ uniform vec3 uAmbient;
 
 void main() {
 	float layerDepth = texture2D(uDepthTexture, gl_FragCoord.xy / vec2(1024, 768)).r;
-	float myDepth = 0.99999 * gl_FragCoord.z - 0.0001;
+	float myDepth = 0.99999 * gl_FragCoord.z;
 	if (myDepth < layerDepth) {
 		discard;
 	}
@@ -35,14 +35,14 @@ void main() {
 	vec3 reflected1 = reflect(toLight1, normal);
 	vec3 reflected2 = reflect(toLight2, normal);
 
-	float specular1 = pow(max(dot(reflected1, fromCamera), 0.0), 32.0);
-	float specular2 = pow(max(dot(reflected2, fromCamera), 0.0), 32.0);
+	float specular1 = pow(max(dot(reflected1, fromCamera), 0.0), 5.0);
+	float specular2 = pow(max(dot(reflected2, fromCamera), 0.0), 5.0);
 	vec3 white = vec3(1.0, 1.0, 1.0);
 
 	vec3 diffuse = diffuse1 + diffuse2;
-	vec3 specular = (specular1/* + specular2*/) * white;
+	vec3 specular = (specular1/* + specular2*/) * mix(white, vColor.rgb, 0.3);
 
-	textureColor.rgb *= (/*specular + */(diffuse + uAmbient) * vColor.rgb) * vColor.a;
+	textureColor.rgb *= (specular + (diffuse + uAmbient) * vColor.rgb) * vColor.a;
 	textureColor.rgb += vColor.rgb * vIndexLum.y * textureColor.a * vColor.a;
 	textureColor.a = vColor.a;
 
