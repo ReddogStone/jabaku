@@ -186,6 +186,9 @@ var WebGL = (function() {
 		createShader: createShader,
 		createProgram: createProgram,
 		createDebugProgram: createDebugProgram,
-		setupWebGL: setupWebGL
+		setupWebGL: setupWebGL,
+		setDebug: function(value) {
+			ENABLE_DEBUG = !!value;
+		}
 	}
 }());
