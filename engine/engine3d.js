@@ -17,7 +17,7 @@ var Engine3D = (function() {
 	var frameBuffers = {};
 	var depthBuffers = {};
 
-	var debugProgram;
+	var debugPrograms;
 	var debugVb;
 	var debugDesc;
 
@@ -32,7 +32,7 @@ var Engine3D = (function() {
 		gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 		gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 
-		debugProgram = WebGL.createDebugProgram(gl);
+		debugPrograms = WebGL.createDebugPrograms(gl);
 		debugVb = createVertexBuffer([
 			-1, 1, 0.0, 1.0,
 			 1, 1, 1.0, 1.0,
@@ -450,11 +450,17 @@ var Engine3D = (function() {
 	}
 
 	function renderDebugQuad(texture, x, y, sx, sy) {
-		setProgram(debugProgram, { uTexture: {texture: texture, sampler: 0} });
-		setVertexBuffer(debugVb, debugDesc);
+		setProgram(debugPrograms.textureCopy, { uTexture: {texture: texture, sampler: 0} });
 		setBlendMode(BlendMode.NONE);
 		setViewport({x: x, y: y, sx: sx, sy: sy});
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		renderScreenQuad();
+	}
+
+	function renderDepthTexture(texture, x, y, sx, sy) {
+		setProgram(debugPrograms.depthTextureCopy, { uTexture: {texture: texture, sampler: 0} });
+		setBlendMode(BlendMode.NONE);
+		setViewport({x: x, y: y, sx: sx, sy: sy});
+		renderScreenQuad();
 	}
 
 	function renderScreenQuad() {
@@ -503,6 +509,7 @@ var Engine3D = (function() {
 		renderTriangles: renderTriangles,
 		renderScreenQuad: renderScreenQuad,
 		renderDebugQuad: renderDebugQuad,
+		renderDepthTexture: renderDepthTexture,
 
 		getDrawingBufferSize: getDrawingBufferSize,
 		get gl() {

@@ -113,9 +113,9 @@ var Jabaku = (function(module) {
 			engine.renderScreenQuad();
 
 			if (this.debugRender) {
-				engine.renderDebugQuad(this._dt1, 0, 0, 200, 200);
-				engine.renderDebugQuad(this._dt2, 200, 0, 200, 200);
-				engine.renderDebugQuad(this._dt3, 400, 0, 200, 200);
+				engine.renderDepthTexture(this._dt1, 0, 0, 200, 200);
+				engine.renderDepthTexture(this._dt2, 200, 0, 200, 200);
+				engine.renderDepthTexture(this._dt3, 400, 0, 200, 200);
 
 				engine.renderDebugQuad(this._rt1, 0, 568, 200, 200);
 				engine.renderDebugQuad(this._rt2, 200, 568, 200, 200);

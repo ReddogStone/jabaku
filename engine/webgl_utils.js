@@ -155,7 +155,7 @@ var WebGL = (function() {
 		return loadProgram(gl, shaders);
 	}
 
-	function createDebugProgram(gl) {
+	function createDebugPrograms(gl) {
 		var vsText = [
 			"attribute vec2 aPosition;",
 			"attribute vec2 aTexCoord;",
@@ -178,14 +178,30 @@ var WebGL = (function() {
 			"	gl_FragColor = vec4(texture2D(uTexture, vTexCoord).rgb, 1.0);",
 			"}"
 		].join('\n');
+		var fsDepthText = [
+			"precision mediump float;",
 
-		return createProgram(gl, vsText, fsText);
+			"varying vec2 vTexCoord;",
+
+			"uniform sampler2D uTexture;",
+
+			"void main() {",
+			"	float depth = texture2D(uTexture, vTexCoord).r;",
+			"	float gray = 2.0 - 2.0 * depth;",
+			"	gl_FragColor = vec4(gray, gray, gray, 1.0);",
+			"}"
+		].join('\n');
+
+		return {
+			textureCopy: createProgram(gl, vsText, fsText),
+			depthTextureCopy: createProgram(gl, vsText, fsDepthText)
+		};
 	}
 
 	return {
 		createShader: createShader,
 		createProgram: createProgram,
-		createDebugProgram: createDebugProgram,
+		createDebugPrograms: createDebugPrograms,
 		setupWebGL: setupWebGL,
 		setDebug: function(value) {
 			ENABLE_DEBUG = !!value;
