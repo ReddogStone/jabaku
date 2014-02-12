@@ -15,11 +15,14 @@ var Jabaku = (function(module) {
 		},
 		add: function(component) {
 			this._components[component.type] = component;
-			this._entitySystem.onComponentAdded(this);
+			this._entitySystem.onComponentAdded(this, component);
 		},
 		remove: function(componentConstructor) {
-			delete this._components[componentConstructor.type];
-			this._entitySystem.onComponentRemoved(this);
+			if (componentConstructor.type in this._components) {
+				var component = this._components[componentConstructor.type];
+				delete this._components[componentConstructor.type];
+				this._entitySystem.onComponentRemoved(this, component);
+			}
 		},
 		contains: function(componentConstructor) {
 			return (componentConstructor.type in this._components);
