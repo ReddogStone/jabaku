@@ -36,6 +36,9 @@ var Jabaku = (function(module) {
 		get global() {
 			return this._global;
 		},
+		clone: function() {
+			return new Transform(this._pos, this._rot, this._scale);
+		},
 		calcTransform: function(parentTransformMatrix) {
 			parentTransformMatrix = parentTransformMatrix || new Vecmath.Matrix4();
 			this._global.copy(parentTransformMatrix).mul(
