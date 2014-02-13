@@ -140,8 +140,9 @@ var Jabaku = (function(module) {
 			var lastIndex = this._ids.length - 1;
 			var lastId = this._ids[lastIndex];
 			this._ids[index] = this._ids[lastIndex];
-			delete this._idToIndex[id];
+			this._ids.length--;
 			this._idToIndex[lastId] = index;
+			delete this._idToIndex[id];
 
 			this.setInstanceCount(this._instanceCount - 1);
 		},	

@@ -35,12 +35,14 @@ var Jabaku = (function(module) {
 				delete this._components[componentConstructor.type];
 				this._entitySystem.onComponentRemoved(this, component);
 			}
+
+			return component;
 		},
 		contains: function(componentConstructor) {
 			if (componentConstructor.type === undefined) {
 				throw new Error(componentConstructor.name + ' is not a component!');
 			}
-			
+
 			return (componentConstructor.type in this._components);
 		}
 	});
@@ -55,14 +57,14 @@ var Jabaku = (function(module) {
 		registerSystem: function(system) {
 			this._systems.push(system);
 		},
-		onComponentAdded: function(entity) {
+		onComponentAdded: function(entity, component) {
 			for (var i = 0; i < this._systems.length; ++i) {
-				this._systems[i].onComponentAdded(entity);
+				this._systems[i].onComponentAdded(entity, component);
 			}
 		},
-		onComponentRemoved: function(entity) {
+		onComponentRemoved: function(entity, component) {
 			for (var i = 0; i < this._systems.length; ++i) {
-				this._systems[i].onComponentRemoved(entity);
+				this._systems[i].onComponentRemoved(entity, component);
 			}
 		}
 	});
