@@ -11,13 +11,25 @@ var Jabaku = (function(module) {
 			return this._debugName;
 		},
 		get: function(componentConstructor) {
+			if (componentConstructor.type === undefined) {
+				throw new Error(componentConstructor.name + ' is not a component!');
+			}
+
 			return this._components[componentConstructor.type];
 		},
 		add: function(component) {
+			if (component.type === undefined) {
+				throw new Error(component.constructor.name + ' is not a component!');
+			}
+
 			this._components[component.type] = component;
 			this._entitySystem.onComponentAdded(this, component);
 		},
 		remove: function(componentConstructor) {
+			if (componentConstructor.type === undefined) {
+				throw new Error(componentConstructor.name + ' is not a component!');
+			}
+
 			if (componentConstructor.type in this._components) {
 				var component = this._components[componentConstructor.type];
 				delete this._components[componentConstructor.type];
@@ -25,6 +37,10 @@ var Jabaku = (function(module) {
 			}
 		},
 		contains: function(componentConstructor) {
+			if (componentConstructor.type === undefined) {
+				throw new Error(componentConstructor.name + ' is not a component!');
+			}
+			
 			return (componentConstructor.type in this._components);
 		}
 	});
