@@ -86,7 +86,14 @@ var Jabaku = (function(module) {
 				var rotation = new Vecmath.Quaternion().setAxisAngle(up, angle);
 				this._pos = targetPos.add(targetToPos.transformQuat(rotation));
 			}
-		}	
+		},
+		moveToTarget: function(target, percentage) {
+			var targetPos = target.clone();
+			if (targetPos) {
+				var targetToPos = this._pos.clone().sub(targetPos);
+				this._pos = targetPos.add(targetToPos.scale(percentage));
+			}
+		}
 	});
 
 	module.Transform = Transform;

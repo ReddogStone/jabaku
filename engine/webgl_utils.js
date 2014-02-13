@@ -187,7 +187,7 @@ var WebGL = (function() {
 
 			"void main() {",
 			"	float depth = texture2D(uTexture, vTexCoord).r;",
-			"	float gray = 2.0 - 2.0 * depth;",
+			"	float gray = log(1.0 / ((1.0 - depth) + 0.0001)) / log(10000.0);",
 			"	gl_FragColor = vec4(gray, gray, gray, 1.0);",
 			"}"
 		].join('\n');
