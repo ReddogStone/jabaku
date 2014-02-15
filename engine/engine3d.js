@@ -24,7 +24,8 @@ var Engine3D = (function() {
 	function init(canvas, debug) {
 		WebGL.setDebug(debug);
 
-		gl = WebGL.setupWebGL(canvas, {antialias: false}, [Extensions.DEPTH_TEXTURE]);
+		gl = WebGL.setupWebGL(canvas, {antialias: false}, 
+			[Extensions.DEPTH_TEXTURE, Extensions.STANDARD_DERIVATIVES]);
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.DEPTH_TEST);
 		gl.colorMask(true, true, true, true);

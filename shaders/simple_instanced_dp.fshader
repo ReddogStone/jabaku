@@ -1,3 +1,5 @@
+#extension GL_OES_standard_derivatives : require
+
 precision mediump float;
 
 varying vec3 vNormal;
@@ -24,7 +26,7 @@ void main() {
 
 	vec3 normal = normalize(vNormal);
 	vec4 textureColor = texture2D(uTexture, vTexCoord);
-	
+
 	vec3 toLight1 = normalize(uPosLight1 - vWorldPos);
 	vec3 toLight2 = normalize(uPosLight2 - vWorldPos);
 	vec3 diffuse1 = uColorLight1 * abs(dot(toLight1, normal));
@@ -47,4 +49,11 @@ void main() {
 	textureColor.a *= vColor.a;
 
 	gl_FragColor = textureColor;
+
+	vec2 dist = min(vTexCoord, vec2(1.0, 1.0) - vTexCoord);
+	vec2 d = fwidth(vTexCoord.xy);
+	vec2 a2 = smoothstep(vec2(0.0), d * 1.5, dist.xy);
+	float edgeI = 1.0 - min(a2.x, a2.y);
+	gl_FragColor = vec4(edgeI, edgeI, edgeI, edgeI);
+//	gl_FragColor = vec4(100.0 * d * vTexCoord, 0.0, 1.0);
 }

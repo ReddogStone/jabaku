@@ -27,10 +27,10 @@ var Jabaku = (function(module) {
 
 			vertices[off++] = 0.5 * c; vertices[off++] = 0.5 * s; vertices[off++] = 0.5; // top x, y, z
 			vertices[off++] = c; vertices[off++] = s; vertices[off++] = 0.0; // top nx, ny, nz
-			vertices[off++] = i / sides; vertices[off++] = 0.0; // top tu, tv
+			vertices[off++] = i % 2; vertices[off++] = 0.0; // top tu, tv
 			vertices[off++] = 0.5 * c; vertices[off++] = 0.5 * s; vertices[off++] = -0.5; // bottom x, y, z
 			vertices[off++] = c; vertices[off++] = s; vertices[off++] = 0.0; // bottom nx, ny, nz
-			vertices[off++] = i / sides; vertices[off++] = 1.0; // bottom tu, tv
+			vertices[off++] = i % 2; vertices[off++] = 1.0; // bottom tu, tv
 		}
 
 		var indices = new Array(3 * 2 * sides);
@@ -121,7 +121,7 @@ var Jabaku = (function(module) {
 				pos.normalize();
 				vertices[off++] = pos.x; vertices[off++] = pos.y; vertices[off++] = pos.z;
 				vertices[off++] = pos.x; vertices[off++] = pos.y; vertices[off++] = pos.z;
-				vertices[off++] = (i + j) % 2; vertices[off++] = 0.0;
+				vertices[off++] = j % 2; vertices[off++] = i % 2;
 			}
 		}
 		var idx = offsets.index;
