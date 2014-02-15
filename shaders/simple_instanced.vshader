@@ -6,14 +6,13 @@ attribute vec4 aWorldY;
 attribute vec4 aWorldZ;
 attribute vec4 aWorldW;
 attribute vec4 aColor;
-attribute vec2 aIndexLum;
+attribute vec3 aLumDiffSpec;
 
 varying vec3 vNormal;
 varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 varying vec4 vColor;
-varying vec2 vIndexLum;
-varying float vTest;
+varying vec3 vLumDiffSpec;
 
 uniform mat4 uWorldIT;
 uniform mat4 uView;
@@ -32,13 +31,9 @@ void main() {
 	
 	gl_Position = vp * worldPos;
 
-	vec4 testPos = vec4(0.0, 0.0, -6.0, 1.0);
-	testPos = uProjection * testPos;
-	vTest = testPos.z / testPos.w;
-
 	vWorldPos = worldPos.xyz;
 	vTexCoord = aTexCoord;
 	vNormal = (normalMatrix * vec4(aNormal, 1.0)).xyz;
 	vColor = aColor;
-	vIndexLum = aIndexLum;
+	vLumDiffSpec = aLumDiffSpec;
 }

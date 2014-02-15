@@ -4,8 +4,7 @@ varying vec3 vNormal;
 varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 varying vec4 vColor;
-varying vec2 vIndexLum;
-varying float vTest;
+varying vec3 vLumDiffSpec;
 
 uniform sampler2D uTexture;
 uniform sampler2D uDepthTexture;
@@ -39,13 +38,13 @@ void main() {
 	float specular2 = pow(max(dot(reflected2, fromCamera), 0.0), 5.0);
 	vec3 white = vec3(1.0, 1.0, 1.0);
 
-	vec3 diffuse = diffuse1 + diffuse2;
-	vec3 specular = (specular1/* + specular2*/) * mix(white, vColor.rgb, 0.3);
+	vec3 diffuse = vLumDiffSpec.y * (diffuse1 + diffuse2) * vColor.rgb;
+	vec3 specular = vLumDiffSpec.z * (specular1/* + specular2*/) * mix(white, vColor.rgb, 0.3);
+	vec3 ambient = uAmbient * vColor.rgb;
 
-	textureColor.rgb *= (specular + (diffuse + uAmbient) * vColor.rgb) * vColor.a;
-	textureColor.rgb += vColor.rgb * vIndexLum.y * textureColor.a * vColor.a;
-	textureColor.a = vColor.a;
+	textureColor.rgb *= (specular + diffuse + uAmbient) * vColor.a;
+	textureColor.rgb += vColor.rgb * vLumDiffSpec.x * textureColor.a * vColor.a;
+	textureColor.a *= vColor.a;
 
-//	gl_FragColor = vec4(textureColor.rgb, 1.0 - textureColor.a);
 	gl_FragColor = textureColor;
 }
