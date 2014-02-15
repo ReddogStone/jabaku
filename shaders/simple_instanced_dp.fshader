@@ -34,15 +34,15 @@ void main() {
 	vec3 reflected1 = reflect(toLight1, normal);
 	vec3 reflected2 = reflect(toLight2, normal);
 
-	float specular1 = pow(max(dot(reflected1, fromCamera), 0.0), 5.0);
-	float specular2 = pow(max(dot(reflected2, fromCamera), 0.0), 5.0);
+	float specular1 = pow(max(dot(reflected1, fromCamera), 0.0), 15.0);
+	float specular2 = pow(max(dot(reflected2, fromCamera), 0.0), 15.0);
 	vec3 white = vec3(1.0, 1.0, 1.0);
 
 	vec3 diffuse = vLumDiffSpec.y * (diffuse1 + diffuse2) * vColor.rgb;
 	vec3 specular = vLumDiffSpec.z * (specular1/* + specular2*/) * mix(white, vColor.rgb, 0.3);
 	vec3 ambient = uAmbient * vColor.rgb;
 
-	textureColor.rgb *= (specular + diffuse + uAmbient) * vColor.a;
+	textureColor.rgb *= (specular + diffuse + ambient) * vColor.a;
 	textureColor.rgb += vColor.rgb * vLumDiffSpec.x * textureColor.a * vColor.a;
 	textureColor.a *= vColor.a;
 
