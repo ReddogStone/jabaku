@@ -40,10 +40,18 @@ SimpleMaterial.extends(Material, {
 });
 
 function SimpleInstMaterial(engine, texture) {
-	Material.call(this, engine, 'simple_instanced', BlendMode.PREMUL_ALPHA);
 	this._texture = texture;
+	this._programs = {
+		regular: engine.getProgram('simple_instanced'),
+		wireframe: engine.getProgram('wireframe_instanced'),
+		depthPeeling: engine.getProgram('simple_instanced_dp')
+	};
+	this.blendMode = BlendMode.PREMUL_ALPHA;
 }
-SimpleInstMaterial.extends(Material, {
+SimpleInstMaterial.extends(Object, {
+	get programs() {
+		return this._programs;
+	},
 	get texture() {
 		return this._texture;
 	},

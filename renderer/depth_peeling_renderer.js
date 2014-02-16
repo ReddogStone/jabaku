@@ -37,7 +37,7 @@ var Jabaku = (function(module) {
 			engine.setClearColor(this._backgroundColor);
 			engine.clear();
 		},
-		_renderObjects: function(objects, params, overrideMaterial) {
+		_renderObjects: function(objects, params, blendMode) {
 			var engine = this._engine;
 
 			for (var i = 0; i < objects.length; ++i) {
@@ -45,9 +45,9 @@ var Jabaku = (function(module) {
 				object.prepare(engine);
 				object.setParams(params);
 
-				var material = overrideMaterial || object.material;
-				engine.setBlendMode(material.blendMode);
-				engine.setProgram(material.program, params);
+				var material = object.material;
+				engine.setBlendMode(blendMode);
+				engine.setProgram(material.programs.depthPeeling, params);
 				object.render(engine);
 			}
 		},
@@ -71,34 +71,22 @@ var Jabaku = (function(module) {
 
 			engine.setFrameBuffer('depthPeelingFB1');
 			params.uDepthTexture = {texture: this._dt2, sampler: 1};
-			this._renderObjects(objects, params, {
-				program: engine.getProgram('simple_instanced_dp'),
-				blendMode: BlendMode.SOLID
-			});
+			this._renderObjects(objects, params, BlendMode.SOLID);
 
 			this._clearFB('depthPeelingFB2', 1.0);
 			engine.setFrameBuffer('depthPeelingFB2');
 			params.uDepthTexture = {texture: this._dt1, sampler: 1};
-			this._renderObjects(objects, params, {
-				program: engine.getProgram('simple_instanced_dp'),
-				blendMode: BlendMode.SOLID
-			});
+			this._renderObjects(objects, params, BlendMode.SOLID);
 
 			this._clearFB('depthPeelingFB3', 1.0);
 			engine.setFrameBuffer('depthPeelingFB3');
 			params.uDepthTexture = {texture: this._dt2, sampler: 1};
-			this._renderObjects(objects, params, {
-				program: engine.getProgram('simple_instanced_dp'),
-				blendMode: BlendMode.SOLID
-			});
+			this._renderObjects(objects, params, BlendMode.SOLID);
 
 			this._clearFB('depthPeelingFB4', 1.0);
 			engine.setFrameBuffer('depthPeelingFB4');
 			params.uDepthTexture = {texture: this._dt3, sampler: 1};
-			this._renderObjects(objects, params, {
-				program: engine.getProgram('simple_instanced_dp'),
-				blendMode: BlendMode.SOLID
-			});
+			this._renderObjects(objects, params, BlendMode.SOLID);
 
 			this._prepareFrameBuffer(frameBuffer);
 
