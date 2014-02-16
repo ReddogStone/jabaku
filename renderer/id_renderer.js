@@ -1,11 +1,11 @@
 var Jabaku = (function(module) {
 	'use strict';
 
-	function WireframeRenderer(engine, backgroundColor) {
+	function IdRenderer(engine, backgroundColor) {
 		this._engine = engine;
 		this._backgroundColor = backgroundColor;
 	}
-	WireframeRenderer.extends(Object, {
+	IdRenderer.extends(Object, {
 		_prepareFrameBuffer: function(frameBuffer) {
 			var engine = this._engine;
 			if (frameBuffer) {
@@ -25,7 +25,7 @@ var Jabaku = (function(module) {
 			utils.setViewport(engine, viewport, params);
 			utils.setCameraParameters(camera, params);
 
-			engine.setBlendMode(BlendMode.PREMUL_ALPHA);
+			engine.setBlendMode(BlendMode.SOLID);
 
 			for (var i = 0; i < objects.length; ++i) {
 				var object = objects[i];
@@ -33,12 +33,12 @@ var Jabaku = (function(module) {
 				object.setParams(params);
 
 				var material = object.material;
-				engine.setProgram(material.programs.wireframe, params);
+				engine.setProgram(material.programs.id, params);
 				object.render(engine);
 			}
 		}
 	});
 
-	module.WireframeRenderer = WireframeRenderer;
+	module.IdRenderer = IdRenderer;
 	return module;
 })(Jabaku || {});

@@ -44,7 +44,8 @@ function SimpleInstMaterial(engine, texture) {
 	this._programs = {
 		regular: engine.getProgram('simple_instanced'),
 		wireframe: engine.getProgram('wireframe_instanced'),
-		depthPeeling: engine.getProgram('simple_instanced_dp')
+		depthPeeling: engine.getProgram('simple_instanced_dp'),
+		id: engine.getProgram('id_instanced')
 	};
 	this.blendMode = BlendMode.PREMUL_ALPHA;
 }

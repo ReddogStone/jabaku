@@ -58,6 +58,8 @@ var Jabaku = (function(module) {
 			engine.clear();
 		},
 		render: function(objects, camera, lightSettings, frameBuffer, viewport) {
+			this._prepareFrameBuffer(frameBuffer);
+
 			var engine = this._engine;
 			var utils = Jabaku.RendererUtils;
 			var params = {};
@@ -88,8 +90,11 @@ var Jabaku = (function(module) {
 			params.uDepthTexture = {texture: this._dt3, sampler: 1};
 			this._renderObjects(objects, params, BlendMode.SOLID);
 
-			this._prepareFrameBuffer(frameBuffer);
-
+			if (frameBuffer) {
+				engine.setFrameBuffer(frameBuffer);
+			} else {
+				engine.setDefaultFrameBuffer();
+			}
 			engine.setBlendMode(BlendMode.NONE);
 			engine.setProgram(this._finalCombineProgram, {
 				uTexture1: {texture: this._rt1, sampler: 0},

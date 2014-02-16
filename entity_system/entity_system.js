@@ -1,7 +1,8 @@
 var Jabaku = (function(module) {
 	'use strict';
 
-	function Entity(entitySystem, debugName) {
+	function Entity(entitySystem, debugName, id) {
+		this._id = id;
 		this._debugName = debugName;
 		this._entitySystem = entitySystem;
 		this._components = {};
@@ -9,6 +10,9 @@ var Jabaku = (function(module) {
 	Entity.extends(Object, {
 		get debugName() {
 			return this._debugName;
+		},
+		get id() {
+			return this._id;
 		},
 		get: function(componentConstructor) {
 			if (componentConstructor.type === undefined) {
@@ -49,10 +53,21 @@ var Jabaku = (function(module) {
 
 	function EntitySystem() {
 		this._systems = [];
+		this._entities = {};
+		this._nextId = 0;
 	}
 	EntitySystem.extends(Object, {
+		get entities() {
+			return this._entities;
+		},
+		get: function(id) {
+			return this._entities[id];
+		},
 		newEntity: function(debugName) {
-			return new Entity(this, debugName);
+			var id = this._nextId++;
+			var entity = new Entity(this, debugName, id);
+			this._entities[id] = entity;
+			return entity;
 		},
 		registerSystem: function(system) {
 			this._systems.push(system);

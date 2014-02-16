@@ -4,7 +4,7 @@ varying vec3 vNormal;
 varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 varying vec4 vColor;
-varying vec3 vLumDiffSpec;
+varying vec4 vLumDiffSpecId;
 
 uniform sampler2D uTexture;
 uniform sampler2D uDepthTexture;
@@ -36,7 +36,7 @@ void main() {
 	vec3 specular = (specular1/* + specular2*/) * white;
 
 	textureColor.rgb *= (/*specular + */(diffuse + uAmbient) * vColor.rgb) * vColor.a;
-	textureColor.rgb += vColor.rgb * vLumDiffSpec.x * textureColor.a * vColor.a;
+	textureColor.rgb += vColor.rgb * vLumDiffSpecId.x * textureColor.a * vColor.a;
 	textureColor.a = vColor.a;
 
 	gl_FragColor = vec4(textureColor.rgb, textureColor.a);

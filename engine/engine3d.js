@@ -214,7 +214,10 @@ var Engine3D = (function() {
 			gl.framebufferTexture2D(gl.FRAMEBUFFER, 
 				gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, depthTexture, 0);
 		} else {
-			var depthBuffer = createDepthBuffer(id + '_db', size);
+			var depthBuffer = createDepthBuffer(id + '_db', {
+				x: renderTexture.width,
+				y: renderTexture.height
+			});
 			gl.framebufferRenderbuffer(gl.FRAMEBUFFER, 
 				gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 		}

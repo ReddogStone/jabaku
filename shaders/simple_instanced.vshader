@@ -6,13 +6,13 @@ attribute vec4 aWorldY;
 attribute vec4 aWorldZ;
 attribute vec4 aWorldW;
 attribute vec4 aColor;
-attribute vec3 aLumDiffSpec;
+attribute vec4 aLumDiffSpecId;
 
 varying vec3 vNormal;
 varying vec2 vTexCoord;
 varying vec3 vWorldPos;
 varying vec4 vColor;
-varying vec3 vLumDiffSpec;
+varying vec4 vLumDiffSpecId;
 
 uniform mat4 uWorldIT;
 uniform mat4 uView;
@@ -35,5 +35,5 @@ void main() {
 	vTexCoord = aTexCoord;
 	vNormal = (normalMatrix * vec4(aNormal, 1.0)).xyz;
 	vColor = aColor;
-	vLumDiffSpec = aLumDiffSpec;
+	vLumDiffSpecId = aLumDiffSpecId;
 }
