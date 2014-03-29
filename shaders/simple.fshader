@@ -20,8 +20,8 @@ void main() {
 	
 	vec3 toLight1 = normalize(uPosLight1 - vWorldPos);
 	vec3 toLight2 = normalize(uPosLight2 - vWorldPos);
-	vec3 diffuse1 = uColorLight1 * clamp(dot(toLight1, normal), 0.0, 1.0);
-	vec3 diffuse2 = uColorLight2 * clamp(dot(toLight2, normal), 0.0, 1.0);
+	vec3 diffuse1 = uColorLight1 * abs(dot(toLight1, normal));
+	vec3 diffuse2 = uColorLight2 * abs(dot(toLight2, normal));
 
 	vec3 fromCamera = normalize(vWorldPos - uPosCamera);
 	vec3 reflected1 = reflect(toLight1, normal);

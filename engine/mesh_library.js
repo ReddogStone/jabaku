@@ -191,5 +191,6 @@ var Jabaku = (function(module) {
 	module.createCylinderData = createCylinderData;
 	module.createCylinderMesh = createCylinderMesh;
 	module.createSphereData = createSphereData;
+	module.createSphereMesh = createSphereMesh;
 	return module;
 })(Jabaku || {});

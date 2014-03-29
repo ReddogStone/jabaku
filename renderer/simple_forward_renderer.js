@@ -16,7 +16,7 @@ var Jabaku = (function(module) {
 			engine.setClearColor(this._backgroundColor);
 			engine.clear();
 		},
-		render: function(objects, camera, lightSettings, frameBuffer, viewport) {
+		render: function(objects, transforms, camera, lightSettings, frameBuffer, viewport) {
 			this._prepareFrameBuffer(frameBuffer);
 
 			var engine = this._engine;
@@ -27,6 +27,11 @@ var Jabaku = (function(module) {
 			utils.setForwardLightParameters(lightSettings, params);
 
 			for (var i = 0; i < objects.length; ++i) {
+				var transform = transforms[i];
+				var globalTrans = transform.global;
+				params.uWorld = globalTrans.val;
+				params.uWorldIT = globalTrans.clone().invert().transpose().val;
+
 				var object = objects[i];
 				object.prepare(engine);
 				object.setParams(params);
