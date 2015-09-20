@@ -1,18 +1,10 @@
-var Jabaku = (function(module) {
+var Camera = (function() {
 	'use strict';
 
-	function Camera(projection, view, target) {
-		this.projection = projection || new Matrix4();
-		this.view = view || new Matrix4();
-		this.target = target;
-		this.pos = new Vector3();
-	}
-	Camera.extends(Object, {
-		makePerspective: function(fov, aspect, nearPlane, farPlane) {
-			this.projection = new Matrix4().perspective(fov, aspect, nearPlane, farPlane);
-		}
-	});
-
-	module.Camera = Camera;
-	return module;
-})(Jabaku || {});
+	return Jabaku.cloneSafeObject([
+		{ name: 'projection', clone: Jabaku.safeClone, default: new Matrix4() },
+		{ name: 'view', clone: Jabaku.safeClone, default: new Matrix4() },
+		{ name: 'target', clone: Jabaku.safeClone, default: new Vector3(0, 0, 1) },
+		{ name: 'pos', clone: Jabaku.safeClone, default: new Vector3(0, 0, 0) }
+	]);
+})();

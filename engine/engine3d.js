@@ -32,7 +32,18 @@ var Engine3D = (function() {
 			aTexCoord: { components: 2, type: 'FLOAT', normalized: false, offset: 2 * 4, stride: 4 * 4}
 		};
 
-		var EMPTY_TEXTURE = createTexture(new Image());
+		var EMPTY_IMAGE = document.createElement('canvas');
+		EMPTY_IMAGE.width = 256;
+		EMPTY_IMAGE.height = 256;
+		var context = EMPTY_IMAGE.getContext('2d');
+		context.fillStyle = 'white';
+		context.fillRect(0, 0, EMPTY_IMAGE.width, EMPTY_IMAGE.height);
+		context.fillStyle = 'black';
+		context.font = 'normal 50px Trebuchet';
+		context.textAlign = 'left';
+		context.textBaseline = 'top';
+		context.fillText('Not Sure', 40, 100);
+		var EMPTY_TEXTURE = createTexture(EMPTY_IMAGE);
 
 		var currentProgram = null;
 
@@ -88,8 +99,10 @@ var Engine3D = (function() {
 			gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, new Uint16Array(data));
 		}
 
-		function createProgram(vertexShader, fragmentShader) {
-			return WebGL.createProgram(gl, vertexShader, fragmentShader);
+		function createProgram(vertexShader, fragmentShader, debugName) {
+			var result = WebGL.createProgram(gl, vertexShader, fragmentShader);
+			result._id = debugName;
+			return result;
 		}
 		
 		function handleLoadedTexture(texture) {
@@ -262,7 +275,7 @@ var Engine3D = (function() {
 						texture = EMPTY_TEXTURE;
 					}
 					if (texture && texture.complete) {
-						var sampler = value.sampler;
+						var sampler = value.sampler || 0;
 						gl.activeTexture(gl['TEXTURE' + sampler]);
 						gl.bindTexture(gl.TEXTURE_2D, texture);
 						gl.uniform1i(location, sampler);
@@ -295,9 +308,9 @@ var Engine3D = (function() {
 			}
 		}
 		
-		function setProgramParameters(parameters) {
+		function setProgramParameters(program, parameters) {
 			FrameProfiler.start('SetParameters');
-			var uniforms = currentProgram.activeUniforms;
+			var uniforms = program.activeUniforms;
 			for (var paramName in parameters) {
 				var param = parameters[paramName];
 				if (paramName in uniforms) {
@@ -317,6 +330,21 @@ var Engine3D = (function() {
 			currentProgram = program;
 			setProgramParameters(parameters);
 			FrameProfiler.stop();
+		}
+
+		function withBuffers(program, vb, ib, description, func) {
+			setBuffers(program, vb, ib, description);
+			func(renderTriangles);
+		}
+
+		function withProgramParameters(program, parameters, func) {
+			setProgramParameters(program, parameters);
+			func(withBuffers.bind(null, program));
+		}
+
+		function withProgram(program, func) {
+			gl.useProgram(program);
+			func(withProgramParameters.bind(null, program));
 		}
 		
 		function setBlendMode(blendmode) {
@@ -350,12 +378,12 @@ var Engine3D = (function() {
 			FrameProfiler.stop();
 		}
 		
-		function setBuffers(vb, ib, description) {
+		function setBuffers(program, vb, ib, description) {
 			FrameProfiler.start('SetBuffers');
 			gl.bindBuffer(gl.ARRAY_BUFFER, vb);
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
 			
-			var attributes = currentProgram.activeAttributes;
+			var attributes = program.activeAttributes;
 			for (var name in description) {
 				var desc = description[name];
 				var index = attributes[name];
@@ -363,17 +391,17 @@ var Engine3D = (function() {
 					gl.enableVertexAttribArray(index);
 					gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
 				} else {
-					throw new Error('No such attribute: "' + name + '" found in the program: "' + currentProgram._id + '"');
+					throw new Error('No such attribute: "' + name + '" found in the program: "' + program._id + '"');
 				}
 			}
 			FrameProfiler.stop();
 		}
 		
-		function setVertexBuffer(vb, description) {
+		function setVertexBuffer(program, vb, description) {
 			FrameProfiler.start('SetBuffers');
 			gl.bindBuffer(gl.ARRAY_BUFFER, vb);
 			
-			var attributes = currentProgram.activeAttributes;
+			var attributes = program.activeAttributes;
 			for (var name in description) {
 				var desc = description[name];
 				var index = attributes[name];
@@ -381,7 +409,7 @@ var Engine3D = (function() {
 					gl.enableVertexAttribArray(index);
 					gl.vertexAttribPointer(index, desc.components, gl[desc.type], desc.normalized, desc.stride, desc.offset);
 				} else {
-					throw new Error('No such attribute: "' + name + '" found in the program: "' + currentProgram._id + '"');
+					throw new Error('No such attribute: "' + name + '" found in the program: "' + program._id + '"');
 				}
 			}
 			FrameProfiler.stop();
@@ -446,15 +474,13 @@ var Engine3D = (function() {
 			updateVertexBufferData: updateVertexBufferData,
 			updateIndexBufferData: updateIndexBufferData,
 
-			getProgram: getProgram,
-			getTexture: getTexture,
-
 			setClearColor: setClearColor,
 			setClearDepth: setClearDepth,
 			setViewport: setViewport,
 			setDefaultViewport: setDefaultViewport,
 			setProgramParameters: setProgramParameters,
 			setProgram: setProgram,
+			withProgram: withProgram,
 			setBlendMode: setBlendMode,
 			setBuffers: setBuffers,
 			setVertexBuffer: setVertexBuffer,

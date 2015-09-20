@@ -1,47 +1,56 @@
-'use strict';
+var Color = (function() {
+	'use strict';
 
-function Color(red, green, blue, alpha) {
-	this.red = red || 0.0;
-	this.green = green || 0.0;
-	this.blue = blue || 0.0;
-	this.alpha = (alpha !== undefined) ? alpha : 1.0;
-}
-
-Color.extends(Object, {
-	toString: function() {
-		var red = Math.floor(this.red * 255.0);
-		var green = Math.floor(this.green * 255.0);
-		var blue = Math.floor(this.blue * 255.0);
-		return 'rgba(' + red + ', ' + green + ', ' + blue + ', ' + this.alpha + ')';
-	},
-	toArray3: function() {
-		return [this.red, this.green, this.blue];
-	},
-	toArray4: function() {
-		return [this.red, this.green, this.blue, this.alpha];
-	}
-});
-
-Color.clone = function(value) {
-	if (value) {
-		if (typeof value == 'string') {
-			if (value in Color) {
-				return Color[value];
-			}
-		} else {
-			return new Color(value.red, value.green, value.blue, value.alpha);
+	function mix(value1, value2, strength1, strength2) {
+		var strengthSum = strength1 + strength2;
+		if (strengthSum < 0.0000001) {
+			return 0.0;
 		}
+		return (value1 * strength1 + value2 * strength2) / strengthSum;
 	}
-	return undefined;
-}
-Color.equal = function(val1, val2) {
-	return (val1.red == val2.red) && (val1.green == val2.green) && (val1.blue == val2.blue) && (val1.alpha == val2.alpha);
-}
 
-Object.defineProperty(Color, 'white', {get: function() { return new Color(1, 1, 1, 1); } })
-Object.defineProperty(Color, 'black', {get: function() { return new Color(0, 0, 0, 1); } })
-Object.defineProperty(Color, 'red', {get: function() { return new Color(1, 0, 0, 1); } })
-Object.defineProperty(Color, 'green', {get: function() { return new Color(0, 1, 0, 1); } })
-Object.defineProperty(Color, 'blue', {get: function() { return new Color(0, 0, 1, 1); } })
-Object.defineProperty(Color, 'gray', {get: function() { return new Color(0.25, 0.25, 0.25, 1); } })
-Object.defineProperty(Color, 'transparentBlack', {get: function() { return new Color(0, 0, 0, 0); } })
+	function make(red, green, blue, alpha) {
+		return { red: red, green: green, blue: blue, alpha: alpha };
+	}
+
+	return {
+		make: function(red, green, blue, alpha) {
+			return make(red || 0, green || 0, blue || 0, (alpha !== undefined) ? alpha : 1);
+		},
+		clone: function(value) {
+			return value ? make(value.red, value.green, value.blue, value.alpha) : undefined;
+		},
+		toCss: function(color) {
+			return 'rgba(' + Math.floor(color.red * 255) + ',' + 
+				Math.floor(color.green * 255) + ',' +
+				Math.floor(color.blue * 255) + ',' +
+				color.alpha + ')';
+		},
+		toByteArray: function(color) {
+			return [
+				Math.floor(color.red * 255),
+				Math.floor(color.green * 255),
+				Math.floor(color.blue * 255),
+				Math.floor(color.alpha * 255)
+			];
+		},
+		toArray3: function(color) {
+			return [color.red, color.green, color.blue];
+		},
+		toArray4: function(color) {
+			return [color.red, color.green, color.blue, color.alpha];
+		},
+		alphaBlend: function(color1, color2) {
+			return make(mix(color1.red, color2.red, color1.alpha, color2.alpha),
+				mix(color1.green, color2.green, color1.alpha, color2.alpha),
+				mix(color1.blue, color2.blue, color1.alpha, color2.alpha),
+				Math.min(color1.alpha + color2.alpha, 1));
+		},
+		equal: function(color1, color2) {
+			return (color1.red == color2.red) &&
+				(color1.green == color2.green) &&
+				(color1.blue == color2.blue) &&
+				(color1.alpha == color2.alpha);
+		}
+	};
+})();

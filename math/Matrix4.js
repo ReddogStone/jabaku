@@ -542,9 +542,9 @@ var Matrix4 = (function() {
 	 * @returns {Matrix4} this for chaining
 	 */
 	mat4.perspective = function (fovy, aspect, near, far) {
-		var out = this.val,
-			f = 1.0 / Math.tan(fovy / 2),
-			nf = 1 / (near - far);
+		var out = this.val;
+		var f = 1 / Math.tan(fovy / 2);
+		var nf = 1 / (near - far);
 		out[0] = f / aspect;
 		out[1] = 0;
 		out[2] = 0;
@@ -575,7 +575,7 @@ var Matrix4 = (function() {
 	 * @param {number} far Far bound of the frustum
 	 * @returns {Matrix4} this for chaining
 	 */
-	mat4.ortho = function (out, left, right, bottom, top, near, far) {
+	mat4.ortho = function (left, right, bottom, top, near, far) {
 		var out = this.val,
 			lr = 1 / (left - right),
 			bt = 1 / (bottom - top),
@@ -705,6 +705,16 @@ var Matrix4 = (function() {
 	};
 
 	mat4.str = mat4.toString;
+
+	Matrix4.perspective = function(fovy, aspect, near, far) {
+		return new Matrix4().perspective(res, fovy, aspect, near, far);
+	};
+	Matrix4.ortho = function(left, right, bottom, top, near, far) {
+		return new Matrix4().ortho(left, right, bottom, top, near, far);
+	};
+	Matrix4.lookAt = function(eye, center, up) {
+		return new Matrix4().lookAt(eye, center, up);
+	}
 
 	return Matrix4;
 })();

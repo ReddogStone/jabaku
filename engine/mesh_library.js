@@ -1,4 +1,4 @@
-var Jabaku = (function(module) {
+var MeshUtils = (function() {
 	function createQuadData() {
 		return {
 			"vertices": [
@@ -165,32 +165,25 @@ var Jabaku = (function(module) {
 		};
 	}
 
-	function createQuadMesh(engine) {
-		var meshData = [createQuadData()];
-		return Mesh.loadFromJson(engine, meshData);
+	return {
+		createScreenQuadData: function() {
+			return {
+				"vertices": [
+					//x	   y	z	 tu   tv
+					-0.5,  0.5, 0.0, 0.0, 0.0,
+					 0.5,  0.5, 0.0, 1.0, 0.0,
+					-0.5, -0.5, 0.0, 0.0, 1.0,
+					 0.5, -0.5, 0.0, 1.0, 1.0],
+				"indices": [0, 1, 2, 2, 1, 3],
+				"description": {
+					"aPosition": { "components": 3, "type": "FLOAT", "normalized": false },
+					"aTexCoord": { "components": 2, "type": "FLOAT", "normalized": false }
+				}
+			};
+		},
+		createQuadData: createQuadData,
+		createCubeData: createCubeData,
+		createCylinderData: createCylinderData,
+		createSphereData: createSphereData
 	}
-
-	function createCylinderMesh(engine, sides) {
-		var meshData = [createCylinderData(sides)];
-		return Mesh.loadFromJson(engine, meshData);
-	}
-
-	function createCubeMesh(engine) {
-		var meshData = [createCubeData()];
-		return Mesh.loadFromJson(engine, meshData);
-	}
-
-	function createSphereMesh(engine, subdivisions) {
-		var meshData = [createSphereData(subdivisions)];
-		return Mesh.loadFromJson(engine, meshData);
-	}
-
-	module.createQuadData = createQuadData;
-	module.createQuadMesh = createQuadMesh;
-	module.createCubeMesh = createCubeMesh;
-	module.createCylinderData = createCylinderData;
-	module.createCylinderMesh = createCylinderMesh;
-	module.createSphereData = createSphereData;
-	module.createSphereMesh = createSphereMesh;
-	return module;
-})(Jabaku || {});
+})();

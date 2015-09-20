@@ -1,16 +1,8 @@
-var Jabaku = (function(module) {
+var PointLight = (function(module) {
 	'use strict';
 
-	function PointLight(pos, color) {
-		this.pos = pos ? pos.clone() : new Vector3();
-		this.color = Color.clone(color);
-	}
-	PointLight.extends(Object, {
-		clone: function() {
-			return new PointLight(this.pos, this.color);
-		}
-	});
-
-	module.PointLight = PointLight;
-	return module;
-})(Jabaku || {});
+	return Jabaku.cloneSafeObject([
+		{ name: 'pos', clone: Jabaku.safeClone, default: new Vector3() },
+		{ name: 'color', clone: Color.clone, default: Color.make(0, 0, 0, 1) },
+	]);
+})();

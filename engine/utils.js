@@ -1,7 +1,10 @@
 var Jabaku = (function(module) {
 	'use strict';
 
-	Object.defineProperty(Object, 'mixin', {value: function(obj, properties) {
+	Object.values = function(obj) {
+		return Object.keys(obj).map(function(key) { return obj[key]; });
+	};
+	Object.mixin = function(obj, properties) {
 		if (properties) {
 			var names = Object.keys(properties);
 			for (var i = 0; i < names.length; ++i) {
@@ -10,7 +13,7 @@ var Jabaku = (function(module) {
 				Object.defineProperty(obj, property, descriptor);
 			}
 		}
-	}});
+	};
 
 	Object.defineProperty(Array.prototype, 'remove', {value: function(element) {
 		var index = this.indexOf(element);
@@ -87,5 +90,40 @@ var Jabaku = (function(module) {
 	module.padNumber = padNumber;
 	module.numberToStringWithSign = numberToStringWithSign;
 	module.integerDifference = integerDifference;
+
+	module.cloneSafeObject = function(desc) {
+		var values = {};
+
+		var make = function() {
+			var args = arguments;
+
+			var result = {};
+
+			desc.forEach(function(type, index) {
+				var key = type.name;
+				var clone = type.clone || function(value) { return value; };
+				values[key] = clone(args[index]) || type.default;
+
+				Object.defineProperty(result, key, {
+					get: function() { return values[key]; },
+					set: function(value) { values[key] = clone(value); }
+				});
+			});
+
+			return result;
+		};
+
+		return {
+			make: make,
+			clone: function(value) {
+				return value ? make.apply(null, desc.map(function(type) { return value[type.name]; })) : undefined;
+			}
+		};
+	};
+
+	module.safeClone = function(value) {
+		return value ? value.clone() : undefined;
+	};
+
 	return module;
 })(Jabaku || {});

@@ -1,32 +1,9 @@
-var Jabaku = (function(module) {
+var ForwardLightSettings = (function() {
 	'use strict';
 
-	function ForwardLightSettings() {
-		this._pointLight1 = null;
-		this._pointLight2 = null;
-		this._ambientColor = Color.clone(Color.black);
-	}
-	ForwardLightSettings.extends(Object, {
-		get ambientColor() {
-			return this._ambientColor;
-		},
-		set ambientColor(value) {
-			this._ambientColor = Color.clone(value.clone());
-		},
-		get pointLight1() {
-			return this._pointLight1;
-		},
-		set pointLight1(value) {
-			this._pointLight1 = value ? value.clone() : value;
-		},
-		get pointLight2() {
-			return this._pointLight2;
-		},
-		set pointLight2(value) {
-			this._pointLight2 = value ? value.clone() : value;
-		}
-	});
-
-	module.ForwardLightSettings = ForwardLightSettings;
-	return module;
-})(Jabaku || {});
+	return Jabaku.cloneSafeObject([
+		{ name: 'pointLight1', clone: PointLight.clone, default: PointLight.make(new Vector3(), Color.make(1, 1, 1, 1)) },
+		{ name: 'pointLight2', clone: PointLight.clone, default: PointLight.make() },
+		{ name: 'ambientColor', clone: Color.clone, default: Color.make(0, 0, 0, 1) }
+	]);	
+})();
