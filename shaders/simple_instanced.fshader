@@ -7,7 +7,6 @@ varying vec4 vColor;
 varying vec4 vLumDiffSpecId;
 
 uniform sampler2D uTexture;
-uniform sampler2D uDepthTexture;
 uniform vec3 uPosCamera;
 uniform vec3 uPosLight1;
 uniform vec3 uColorLight1;
