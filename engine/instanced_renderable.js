@@ -249,8 +249,8 @@ PointSpriteBatchRenderable.extends(Object, {
 		var index = this._idMap.getIndex(id);
 		var data = this._instancedRenderable.getSingleInstance(index);
 		return {
-			pos: new Vecmath.Vector3(data[0], data[1], data[2]),
-			size: new Vecmath.Vector2(data[3], data[4]),
+			pos: new Vector3(data[0], data[1], data[2]),
+			size: new Vector2(data[3], data[4]),
 			color: new Color(data[5], data[6], data[7], data[8]),
 			atlasIndex: data[9]
 		};
@@ -341,8 +341,8 @@ LineBatchRenderable.extends(Object, {
 		var index = this._idMap.getIndex(id);
 		var data = this._instancedRenderable.getSingleInstance(index);
 		return {
-			endPoint1: new Vecmath.Vector3(data[0], data[1], data[2]),
-			endPoint2: new Vecmath.Vector3(data[3], data[4], data[5]),
+			endPoint1: new Vector3(data[0], data[1], data[2]),
+			endPoint2: new Vector3(data[3], data[4], data[5]),
 			color: new Color(data[6], data[7], data[8], data[9]),
 			width: data[10],
 			patternIndex: data[11]

@@ -1,15 +1,15 @@
-var Vecmath = (function(module) {
+var Vector3 = (function() {
 	'use strict';
 
 	function Vector3(x, y, z) {
 		if (typeof x === "object") {
-			this.x = x.x||0;
-			this.y = x.y||0;
-			this.z = x.z||0;
+			this.x = x.x || 0;
+			this.y = x.y || 0;
+			this.z = x.z || 0;
 		} else {
-			this.x = x||0;
-			this.y = y||0;
-			this.z = z||0;
+			this.x = x || 0;
+			this.y = y || 0;
+			this.z = z || 0;
 		}
 	}
 
@@ -29,13 +29,13 @@ var Vecmath = (function(module) {
 
 	vec3.set = function(x, y, z) {
 		if (typeof x === "object") {
-			this.x = x.x||0;
-			this.y = x.y||0;
-			this.z = x.z||0;
+			this.x = x.x || 0;
+			this.y = x.y || 0;
+			this.z = x.z || 0;
 		} else {
-			this.x = x||0;
-			this.y = y||0;
-			this.z = z||0;
+			this.x = x || 0;
+			this.y = y || 0;
+			this.z = z || 0;
 		}
 		return this;
 	};
@@ -142,7 +142,7 @@ var Vecmath = (function(module) {
 		var ax = this.x,
 			ay = this.y,
 			az = this.z;
-		t = t||0;
+		t = t || 0;
 		this.x = ax + t * (v.x - ax);
 		this.y = ay + t * (v.y - ay);
 		this.z = az + t * (v.z - az);
@@ -289,6 +289,5 @@ var Vecmath = (function(module) {
 
 	vec3.str = vec3.toString;
 
-	module.Vector3 = Vector3;
-	return module;	
-}) (Vecmath || {});
+	return Vector3;
+}) ();

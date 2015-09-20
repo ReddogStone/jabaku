@@ -1,4 +1,4 @@
-var Vecmath = (function(module) {
+var Matrix4 = (function() {
 	'use strict';
 
 	var ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
@@ -706,6 +706,5 @@ var Vecmath = (function(module) {
 
 	mat4.str = mat4.toString;
 
-	module.Matrix4 = Matrix4;
-	return module;
-}) (Vecmath || {});
+	return Matrix4;
+})();

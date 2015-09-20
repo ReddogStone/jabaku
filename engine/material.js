@@ -105,7 +105,7 @@ TextMaterial.extends(Material, {
 
 function PointSpriteMaterial(engine, texture, size, color) {
 	Material.call(this, engine, 'pointsprite', BlendMode.PREMUL_ALPHA);
-	this._size = size || new Vecmath.Vector2(64, 64);
+	this._size = size || new Vector2(64, 64);
 	this._texture = texture;
 	this._color = Color.clone(color) || Color.white;
 }

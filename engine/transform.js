@@ -2,10 +2,10 @@ var Jabaku = (function(module) {
 	'use strict';
 
 	function Transform(pos, rot, scale) {
-		this._pos = pos ? pos.clone() : new Vecmath.Vector3();
-		this._rot = rot ? rot.clone() : new Vecmath.Quaternion().identity();
-		this._scale = scale ? scale.clone() : new Vecmath.Vector3(1, 1, 1);
-		this._global = new Vecmath.Matrix4();
+		this._pos = pos ? pos.clone() : new Vector3();
+		this._rot = rot ? rot.clone() : new Quaternion().identity();
+		this._scale = scale ? scale.clone() : new Vector3(1, 1, 1);
+		this._global = new Matrix4();
 	}
 	Transform.type = 'transform';
 	Transform.extends(Object, {
@@ -28,10 +28,10 @@ var Jabaku = (function(module) {
 			this._rot = value.clone();
 		},
 		get direction() {
-			return new Vecmath.Vector3(0, 0, -1).transformQuat(this._rot);
+			return new Vector3(0, 0, -1).transformQuat(this._rot);
 		},
 		get up() {
-			return new Vecmath.Vector3(0, 1, 0).transformQuat(this._rot);
+			return new Vector3(0, 1, 0).transformQuat(this._rot);
 		},
 		get global() {
 			return this._global;
@@ -40,9 +40,9 @@ var Jabaku = (function(module) {
 			return new Transform(this._pos, this._rot, this._scale);
 		},
 		calcTransform: function(parentTransformMatrix) {
-			parentTransformMatrix = parentTransformMatrix || new Vecmath.Matrix4();
+			parentTransformMatrix = parentTransformMatrix || new Matrix4();
 			this._global.copy(parentTransformMatrix).mul(
-				new Vecmath.Matrix4().fromRotationTranslation(this._rot, this._pos).scale(this._scale));
+				new Matrix4().fromRotationTranslation(this._rot, this._pos).scale(this._scale));
 		},
 		translate: function(vec) {
 			this._pos.add(vec);
@@ -67,7 +67,7 @@ var Jabaku = (function(module) {
 				var dirDotUp = dir.dot(up);
 				if ((Math.abs(dirDotUp) < 0.99) || ((dirDotUp * angle) > 0)) {
 					var right = up.clone().cross(dir).normalize();
-					var rotation = new Vecmath.Quaternion().setAxisAngle(right, angle);
+					var rotation = new Quaternion().setAxisAngle(right, angle);
 					this._pos = targetPos.add(targetToPos.transformQuat(rotation));
 				}
 			}
@@ -83,7 +83,7 @@ var Jabaku = (function(module) {
 				angle *= right.length();
 				right.normalize();
 				up = dir.clone().cross(right).normalize();
-				var rotation = new Vecmath.Quaternion().setAxisAngle(up, angle);
+				var rotation = new Quaternion().setAxisAngle(up, angle);
 				this._pos = targetPos.add(targetToPos.transformQuat(rotation));
 			}
 		},

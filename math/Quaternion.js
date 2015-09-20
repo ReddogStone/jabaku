@@ -1,8 +1,5 @@
-var Vecmath = (function(module) {
+var Quaternion = (function() {
 	'use strict';
-
-	var Vector3 = module.Vector3;
-	var Matrix3 = module.Matrix3;
 
 	//some shared 'private' arrays
 	var s_iNext = (typeof Int8Array !== 'undefined' ? new Int8Array([1,2,0]) : [1,2,0]);
@@ -376,6 +373,5 @@ var Vecmath = (function(module) {
 
 	quat.str = quat.toString;
 
-	module.Quaternion = Quaternion;
-	return module;
-}) (Vecmath || {});
+	return Quaternion;
+}) ();

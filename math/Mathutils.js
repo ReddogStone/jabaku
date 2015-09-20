@@ -1,4 +1,4 @@
-var Vecmath = (function(module) {
+var Vecmath = (function() {
 	'use strict';
 
 	function expAttVec(value, target, deltaTime, halfTime) {
@@ -6,7 +6,15 @@ var Vecmath = (function(module) {
 		value.lerp(target, amount);
 	}
 	
-	module.expAttVec = expAttVec;
-	
-	return module;
-}) (Vecmath || {});
+	function distPointRay(point, ray) {
+		var baseToPoint = point.clone().sub(ray.from);
+		var lenSq = baseToPoint.lenSq();
+		var dot = baseToPoint.dot(ray.dir());
+		return Math.sqrt(lenSq - dot * dot);
+	}
+
+	return {
+		expAttVec: expAttVec,
+		distPointRay: distPointRay
+	};
+}) ();

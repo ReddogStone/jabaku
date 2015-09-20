@@ -16,7 +16,7 @@ var Jabaku = (function(module) {
 	}
 	Viewport.extends(Object, {
 		toVector4: function() {
-			return new Vecmath.Vector4(this.x, this.y, this.sx, this.sy);
+			return new Vector4(this.x, this.y, this.sx, this.sy);
 		}
 	});
 	Viewport.clone = function(value) {

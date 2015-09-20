@@ -1,4 +1,4 @@
-var Vecmath = (function(module) {
+var Vector4 = (function() {
 	'use strict';
 
 	function Vector4(x, y, z, w) {
@@ -228,6 +228,5 @@ var Vecmath = (function(module) {
 
 	vec4.str = vec4.toString;
 
-	module.Vector4 = Vector4;
-	return module;	
-}) (Vecmath || {});
+	return Vector4;
+}) ();

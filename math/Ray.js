@@ -1,4 +1,4 @@
-var Vecmath = (function(module) {
+var Ray = (function() {
 	'use strict';
 
 	function Ray(from, to) {
@@ -30,15 +30,5 @@ var Vecmath = (function(module) {
 	
 	ray.dir = ray.direction;
 	
-	function distPointRay(point, ray) {
-		var baseToPoint = point.clone().sub(ray.from);
-		var lenSq = baseToPoint.lenSq();
-		var dot = baseToPoint.dot(ray.dir());
-		return Math.sqrt(lenSq - dot * dot);
-	}	
-
-	module.Ray = Ray;
-	module.distPointRay = distPointRay;
-
-	return module;
-}) (Vecmath || {});
+	return Ray;
+})();

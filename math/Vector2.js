@@ -1,13 +1,13 @@
-var Vecmath = (function(module) {
+var Vector2 = (function() {
 	'use strict';
 
 	function Vector2(x, y) {
 		if (typeof x === "object") {
-			this.x = x.x||0;
-			this.y = x.y||0;
+			this.x = x.x || 0;
+			this.y = x.y || 0;
 		} else {
-			this.x = x||0;
-			this.y = y||0;
+			this.x = x || 0;
+			this.y = y || 0;
 		}
 	}
 
@@ -23,39 +23,19 @@ var Vecmath = (function(module) {
 		return new Vector2(this.x, this.y);
 	};
 
-	/**
-	 * Copies the x, y components from the specified
-	 * Vector. Any undefined components from `otherVec`
-	 * will default to zero.
-	 * 
-	 * @param  {otherVec} the other Vector2 to copy
-	 * @return {Vector2}  this, for chaining
-	 */
 	vec2.copy = function(otherVec) {
-		this.x = otherVec.x||0;
-		this.y = otherVec.y||0;
+		this.x = otherVec.x || 0;
+		this.y = otherVec.y || 0;
 		return this;
 	};
 
-	/**
-	 * A convenience function to set the components of
-	 * this vector as x and y. Falsy or undefined
-	 * parameters will default to zero.
-	 *
-	 * You can also pass a vector object instead of
-	 * individual components, to copy the object's components.
-	 * 
-	 * @param {Number} x the x component
-	 * @param {Number} y the y component
-	 * @return {Vector2}  this, for chaining
-	 */
 	vec2.set = function(x, y) {
 		if (typeof x === "object") {
-			this.x = x.x||0;
-			this.y = x.y||0;
+			this.x = x.x || 0;
+			this.y = x.y || 0;
 		} else {
-			this.x = x||0;
-			this.y = y||0;
+			this.x = x || 0;
+			this.y = y || 0;
 		}
 		return this;
 	};
@@ -136,8 +116,6 @@ var Vecmath = (function(module) {
 		return this.x * v.x + this.y * v.y;
 	};
 
-	//Unlike Vector3, this returns a scalar
-	//http://allenchou.net/2013/07/cross-product-of-2d-vectors/
 	vec2.cross = function(v) {
 		return this.x * v.y - this.y * v.x;
 	};
@@ -205,6 +183,5 @@ var Vecmath = (function(module) {
 
 	vec2.str = vec2.toString;
 
-	module.Vector2 = Vector2;
-	return module;
-}) (Vecmath || {});	
+	return Vector2;
+})();

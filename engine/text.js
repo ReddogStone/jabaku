@@ -134,7 +134,7 @@ var Jabaku = (function (module) {
 	function Text(engine, text, font, color, screenOffset) {
 		TextBase.call(this, engine, text, font, color);
 		this.material = new TextMaterial(engine, engine.createTexture(this._bufferCanvas), this._color);		
-		this._screenOffset = screenOffset ? screenOffset.clone() : new Vecmath.Vector2(0.0, 0.0);
+		this._screenOffset = screenOffset ? screenOffset.clone() : new Vector2(0.0, 0.0);
 	}
 	Text.extends(TextBase, {
 		_createMesh: function(engine, size, canvasSize) {

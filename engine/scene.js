@@ -168,7 +168,7 @@ Scene.extends(Object, {
 
 		FrameProfiler.start('GetCameraStuff');
 		var camera = this.cameraSystem.get(camId);
-		var view = new Vecmath.Matrix4();
+		var view = new Matrix4();
 		if (camera !== undefined) {
 			var camTrans = this.transformSystem.get(camId);
 			view = camera.view;
