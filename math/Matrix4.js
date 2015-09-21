@@ -707,13 +707,13 @@ var Matrix4 = (function() {
 	mat4.str = mat4.toString;
 
 	Matrix4.perspective = function(fovy, aspect, near, far) {
-		return new Matrix4().perspective(res, fovy, aspect, near, far);
+		return new Matrix4().perspective(fovy, aspect, near, far);
 	};
 	Matrix4.ortho = function(left, right, bottom, top, near, far) {
 		return new Matrix4().ortho(left, right, bottom, top, near, far);
 	};
-	Matrix4.lookAt = function(eye, center, up) {
-		return new Matrix4().lookAt(eye, center, up);
+	Matrix4.lookAt = function(eye, target, up) {
+		return new Matrix4().lookAt(eye, target, up);
 	}
 
 	return Matrix4;
