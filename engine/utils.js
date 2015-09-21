@@ -90,12 +90,20 @@ var Jabaku = (function(module) {
 		return false;
 	}});
 
+	Object.defineProperty(Array.prototype, 'flatten', {value: function() {
+		return this.reduce(function(memo, current) {
+			return memo.concat(current);
+		}, []);
+	}});
+
 	Object.defineProperty(Function.prototype, 'extends', {value: function(parent, methods) {
 	    this.prototype = Object.create(parent.prototype);
 	    Object.defineProperty(this.prototype, 'constructor', {value: this});
 		
 		Object.mixin(this.prototype, methods);
 	}});
+
+
 
 	function padNumber(number, width) {
 		return ('00000000' + number).slice(-width);
