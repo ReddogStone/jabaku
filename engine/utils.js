@@ -15,6 +15,28 @@ var Jabaku = (function(module) {
 		}
 	};
 
+	function copyTo(from, to) {
+		Object.keys(from).forEach(function(key) {
+			to[key] = from[key];
+		});
+	}
+	Object.clone = function(obj) {
+		var result = {};
+		copyTo(obj, result);
+		return result;
+	};
+
+	function merge(obj1, obj2) {
+		var result = {};
+		copyTo(obj1, result);
+		copyTo(obj2, result);
+		return result;		
+	}
+
+	Object.merge = function() {
+		return Array.prototype.reduce.call(arguments, merge);
+	};
+
 	Object.defineProperty(Array.prototype, 'remove', {value: function(element) {
 		var index = this.indexOf(element);
 		if (index > -1) {
