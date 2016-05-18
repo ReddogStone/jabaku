@@ -47,8 +47,6 @@ module.exports = function(canvas, debug) {
 	context.fillText('Not Sure', 40, 100);
 	const EMPTY_TEXTURE = createTexture(EMPTY_IMAGE);
 
-	let currentProgram = null;
-
 	function createVertexBufferWithSize(sizeInBytes, dynamic) {
 		dynamic = dynamic || false;
 		
@@ -135,7 +133,9 @@ module.exports = function(canvas, debug) {
 		let texture = gl.createTexture();
 		texture.image = image;
 		
-		image.onload = function() { handleLoadedTexture(texture); };
+		image.onload = function() {
+			handleLoadedTexture(texture);
+		};
 		image.src = path;
 
 		return texture;
@@ -310,9 +310,8 @@ module.exports = function(canvas, debug) {
 		}
 	}
 	
-	function setProgramParameters(program, parameters) {
+	function setProgramParameters(uniforms, parameters) {
 		FrameProfiler.start('SetParameters');
-		let uniforms = program.activeUniforms;
 		for (let paramName in parameters) {
 			let param = parameters[paramName];
 			if (paramName in uniforms) {
@@ -329,8 +328,7 @@ module.exports = function(canvas, debug) {
 		FrameProfiler.start('SetProgram');
 	
 		gl.useProgram(program);
-		currentProgram = program;
-		setProgramParameters(parameters);
+		setProgramParameters(program.activeUniforms, parameters);
 		FrameProfiler.stop();
 	}
 
@@ -444,18 +442,18 @@ module.exports = function(canvas, debug) {
 		setProgram(debugPrograms.textureCopy, { uTexture: {texture: texture, sampler: 0} });
 		setBlendMode(BlendMode.NONE);
 		setViewport({x: x, y: y, sx: sx, sy: sy});
-		renderScreenQuad();
+		renderScreenQuad(debugPrograms.textureCopy);
 	}
 
 	function renderDepthTexture(texture, x, y, sx, sy) {
 		setProgram(debugPrograms.depthTextureCopy, { uTexture: {texture: texture, sampler: 0} });
 		setBlendMode(BlendMode.NONE);
 		setViewport({x: x, y: y, sx: sx, sy: sy});
-		renderScreenQuad();
+		renderScreenQuad(debugPrograms.depthTextureCopy);
 	}
 
-	function renderScreenQuad() {
-		setVertexBuffer(debugVb, debugDesc);
+	function renderScreenQuad(program) {
+		setVertexBuffer(program, debugVb, debugDesc);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	}
 	
