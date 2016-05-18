@@ -1,6 +1,7 @@
 'use strict';
 
 const Extensions = require('./webgl-extensions');
+const FrameProfiler = require('../profiler/profiler');
 
 const BlendMode = {
 	SOLID: {name: 'SOLID'},
