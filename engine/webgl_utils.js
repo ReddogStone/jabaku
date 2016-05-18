@@ -1,49 +1,161 @@
 'use strict';
 
-var Extensions = {
-	DEPTH_TEXTURE: {
-		id: 'DEPTH_TEXTURE',
-		names: ['WEBGL_depth_texture', 'WEBKIT_WEBGL_depth_texture']
-	},
-	STANDARD_DERIVATIVES: {
-		id: 'STANDARD_DERIVATIVES',
-		names: ['OES_standard_derivatives']
-	}
-};
+const WebGLDebugUtils = require('./webgl-debug');
 
-var WebGL = (function() {
-	var ENABLE_DEBUG = true;
+function getExtensions(gl, extensions) {
+	let result = {};
 
-	function getExtensions(gl, extensions) {
-		var result = {};
-
-		if (extensions) {
-			for (var i = 0; i < extensions.length; ++i) {
-				var extDesc = extensions[i];
-				var extension;
-				for (var extNameIdx = 0; extNameIdx < extDesc.names.length; ++j) {
-					var extName = extDesc.names[extNameIdx];
-					extension = gl.getExtension(extName);
-					if (extension !== undefined) {
-						break;
-					}
-				}
-
+	if (extensions) {
+		for (let i = 0; i < extensions.length; ++i) {
+			let extDesc = extensions[i];
+			let extension;
+			for (let extNameIdx = 0; extNameIdx < extDesc.names.length; ++j) {
+				let extName = extDesc.names[extNameIdx];
+				extension = gl.getExtension(extName);
 				if (extension !== undefined) {
-					result[extDesc.id] = extension;
-				} else {
-					console.log('Failed to load "' + extDesc.id + '" extension!');
+					break;
 				}
 			}
-		}
 
-		return result;
+			if (extension !== undefined) {
+				result[extDesc.id] = extension;
+			} else {
+				console.log('Failed to load "' + extDesc.id + '" extension!');
+			}
+		}
 	}
 
+	return result;
+}
+
+/**
+ * Loads a shader.
+ */
+function loadShader(gl, source, type) {
+	let shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	let compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+	if (!compiled) {
+		throw new Error(gl.getShaderInfoLog(shader));
+		gl.deleteShader(shader);
+		return null;
+	}
+	return shader;
+}
+
+/**
+ * Creates a program with shaders attached and binds the attribute locations.
+ * It also links the program.
+ */
+function loadProgram(gl, shaders) {
+	let program = gl.createProgram();
+	for (let i = 0; i < shaders.length; ++i) {
+		gl.attachShader(program, shaders[i]);
+	}
+	gl.linkProgram(program);
+
+	let attributeCount = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES)
+	let attributes = {};
+	for (let i = 0; i < attributeCount; ++i) {
+		let info = gl.getActiveAttrib(program, i);
+		gl.bindAttribLocation(program, i, info.name);
+		attributes[info.name] = i;
+	}
+	program.activeAttributes = attributes;
+
+	let uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+	let uniforms = {};
+	for (let i = 0; i < uniformCount; ++i) {
+		let info = gl.getActiveUniform(program, i);
+		uniforms[info.name] = {type: info.type, location: gl.getUniformLocation(program, info.name)};
+	}
+	program.activeUniforms = uniforms;
+	
+	let linked = gl.getProgramParameter(program, gl.LINK_STATUS);
+	if (!linked) {
+		throw new Error('Linking error: ' + gl.getProgramInfoLog(program));
+		gl.deleteProgram(program);
+		return null;
+	}
+	
+	return program;
+}
+
+/**
+ * Loads a shader from a string.
+ */
+function createShader(gl, source, type) {
+	let shader = null;
+	try {
+		shader = loadShader(gl, source, type);
+	} catch (e) {
+		e.message = 'Error compiling\n\n' + source + '\n\n: ' + e.message;
+		throw e;
+	}
+	
+	return shader;
+}
+
+/**
+ * Creates a program from 2 files
+ */
+function createProgram(gl, vertexShader, fragmentShader) {
+	let shaders = [
+		createShader(gl, vertexShader, gl.VERTEX_SHADER),
+		createShader(gl, fragmentShader, gl.FRAGMENT_SHADER)
+	];
+	return loadProgram(gl, shaders);
+}
+
+function createDebugPrograms(gl) {
+	let vsText = [
+		"attribute vec2 aPosition;",
+		"attribute vec2 aTexCoord;",
+
+		"varying vec2 vTexCoord;",
+
+		"void main() {",
+		"	vTexCoord = aTexCoord;",
+		"	gl_Position = vec4(aPosition, 0.5, 1.0);",
+		"}"
+	].join('\n');
+	let fsText = [
+		"precision mediump float;",
+
+		"varying vec2 vTexCoord;",
+
+		"uniform sampler2D uTexture;",
+
+		"void main() {",
+		"	gl_FragColor = vec4(texture2D(uTexture, vTexCoord).rgb, 1.0);",
+		"}"
+	].join('\n');
+	let fsDepthText = [
+		"precision mediump float;",
+
+		"varying vec2 vTexCoord;",
+
+		"uniform sampler2D uTexture;",
+
+		"void main() {",
+		"	float depth = texture2D(uTexture, vTexCoord).r;",
+		"	float gray = log(1.0 / ((1.0 - depth) + 0.0001)) / log(10000.0);",
+		"	gl_FragColor = vec4(gray, gray, gray, 1.0);",
+		"}"
+	].join('\n');
+
+	return {
+		textureCopy: createProgram(gl, vsText, fsText),
+		depthTextureCopy: createProgram(gl, vsText, fsDepthText)
+	};
+}
+
+module.exports = function(enableDebug) {
 	function create3DContext(canvas, attributes, extensions) {
-		var names = ["webgl", "experimental-webgl"];
-		var context = null;
-		for (var i = 0; i < names.length; ++i) {
+		let names = ["webgl", "experimental-webgl"];
+		let context = null;
+		for (let i = 0; i < names.length; ++i) {
 			try {
 				context = canvas.getContext(names[i], attributes);
 			} catch(e) {
@@ -61,7 +173,7 @@ var WebGL = (function() {
 
 		context.extensions = getExtensions(context, extensions);
 
-		return ENABLE_DEBUG ? WebGLDebugUtils.makeDebugContext(context) : context;
+		return enableDebug ? WebGLDebugUtils.makeDebugContext(context) : context;
 	}
 
 	/**
@@ -72,143 +184,17 @@ var WebGL = (function() {
 			throw new Error('Browser doesn\'t support WebGL!');
 		}
 
-		var context = create3DContext(canvas, attributes, extensions);
+		let context = create3DContext(canvas, attributes, extensions);
 		if (!context) {
 			throw new Error('Couldn\'t create a WebGL context!');
 		}
 		return context;
 	};
 
-	/**
-	 * Loads a shader.
-	 */
-	function loadShader(gl, source, type) {
-		var shader = gl.createShader(type);
-		gl.shaderSource(shader, source);
-		gl.compileShader(shader);
-		var compiled = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-		if (!compiled) {
-			throw new Error(gl.getShaderInfoLog(shader));
-			gl.deleteShader(shader);
-			return null;
-		}
-		return shader;
-	}
-
-	/**
-	 * Creates a program with shaders attached and binds the attribute locations.
-	 * It also links the program.
-	 */
-	function loadProgram(gl, shaders) {
-		var program = gl.createProgram();
-		for (var i = 0; i < shaders.length; ++i) {
-			gl.attachShader(program, shaders[i]);
-		}
-		gl.linkProgram(program);
-
-		var attributeCount = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES)
-		var attributes = {};
-		for (var i = 0; i < attributeCount; ++i) {
-			var info = gl.getActiveAttrib(program, i);
-			gl.bindAttribLocation(program, i, info.name);
-			attributes[info.name] = i;
-		}
-		program.activeAttributes = attributes;
-
-		var uniformCount = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-		var uniforms = {};
-		for (var i = 0; i < uniformCount; ++i) {
-			var info = gl.getActiveUniform(program, i);
-			uniforms[info.name] = {type: info.type, location: gl.getUniformLocation(program, info.name)};
-		}
-		program.activeUniforms = uniforms;
-		
-		var linked = gl.getProgramParameter(program, gl.LINK_STATUS);
-		if (!linked) {
-			throw new Error('Linking error: ' + gl.getProgramInfoLog(program));
-			gl.deleteProgram(program);
-			return null;
-		}
-		
-		return program;
-	}
-
-	/**
-	 * Loads a shader from a string.
-	 */
-	function createShader(gl, source, type) {
-		var shader = null;
-		try {
-			shader = loadShader(gl, source, type);
-		} catch (e) {
-			e.message = 'Error compiling\n\n' + source + '\n\n: ' + e.message;
-			throw e;
-		}
-		
-		return shader;
-	}
-
-	/**
-	 * Creates a program from 2 files
-	 */
-	function createProgram(gl, vertexShader, fragmentShader) {
-		var shaders = [
-			createShader(gl, vertexShader, gl.VERTEX_SHADER),
-			createShader(gl, fragmentShader, gl.FRAGMENT_SHADER)
-		];
-		return loadProgram(gl, shaders);
-	}
-
-	function createDebugPrograms(gl) {
-		var vsText = [
-			"attribute vec2 aPosition;",
-			"attribute vec2 aTexCoord;",
-
-			"varying vec2 vTexCoord;",
-
-			"void main() {",
-			"	vTexCoord = aTexCoord;",
-			"	gl_Position = vec4(aPosition, 0.5, 1.0);",
-			"}"
-		].join('\n');
-		var fsText = [
-			"precision mediump float;",
-
-			"varying vec2 vTexCoord;",
-
-			"uniform sampler2D uTexture;",
-
-			"void main() {",
-			"	gl_FragColor = vec4(texture2D(uTexture, vTexCoord).rgb, 1.0);",
-			"}"
-		].join('\n');
-		var fsDepthText = [
-			"precision mediump float;",
-
-			"varying vec2 vTexCoord;",
-
-			"uniform sampler2D uTexture;",
-
-			"void main() {",
-			"	float depth = texture2D(uTexture, vTexCoord).r;",
-			"	float gray = log(1.0 / ((1.0 - depth) + 0.0001)) / log(10000.0);",
-			"	gl_FragColor = vec4(gray, gray, gray, 1.0);",
-			"}"
-		].join('\n');
-
-		return {
-			textureCopy: createProgram(gl, vsText, fsText),
-			depthTextureCopy: createProgram(gl, vsText, fsDepthText)
-		};
-	}
-
 	return {
 		createShader: createShader,
 		createProgram: createProgram,
 		createDebugPrograms: createDebugPrograms,
-		setupWebGL: setupWebGL,
-		setDebug: function(value) {
-			ENABLE_DEBUG = !!value;
-		}
+		setupWebGL: setupWebGL
 	}
-}());
+};
