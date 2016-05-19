@@ -1,7 +1,11 @@
-var Vector3 = (function() {
+module.exports = (function() {
 	'use strict';
 
 	function Vector3(x, y, z) {
+		if (!(this instanceof Vector3)) {
+			return new Vector3(x, y, z);
+		}
+
 		if (typeof x === "object") {
 			this.x = x.x || 0;
 			this.y = x.y || 0;
