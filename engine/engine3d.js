@@ -1,15 +1,10 @@
 'use strict';
 
+const assert = require('assert');
+
 const Extensions = require('./webgl-extensions');
 const FrameProfiler = require('../profiler/profiler');
-
-const BlendMode = {
-	SOLID: {name: 'SOLID'},
-	ALPHA: {name: 'ALPHA'},
-	PREMUL_ALPHA: {name: 'PREMUL_ALPHA'},
-	NONE: {name: 'NONE'},
-	DEPTH_PEELING: {name: 'DEPTH_PEELING'},
-};
+const BlendMode = require('./blend-mode');
 
 module.exports = function(canvas, debug) {
 	const WebGL = require('./webgl_utils')(debug);
@@ -216,10 +211,12 @@ module.exports = function(canvas, debug) {
 	}
 
 	function setClearColor(color) {
+		assert(color, 'No color given');
 		gl.clearColor(color.red, color.green, color.blue, color.alpha);
 	}
 
 	function setClearDepth(value) {
+		assert(value, 'No depth value given');
 		gl.clearDepth(value);
 	}
 	
