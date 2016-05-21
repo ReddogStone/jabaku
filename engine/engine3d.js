@@ -210,9 +210,8 @@ module.exports = function(canvas, debug) {
 		setFrameBuffer(null);
 	}
 
-	function setClearColor(color) {
-		assert(color, 'No color given');
-		gl.clearColor(color.red, color.green, color.blue, color.alpha);
+	function setClearColor(red, green, blue, alpha) {
+		gl.clearColor(red, green, blue, alpha);
 	}
 
 	function setClearDepth(value) {
@@ -220,8 +219,8 @@ module.exports = function(canvas, debug) {
 		gl.clearDepth(value);
 	}
 	
-	function setViewport(value) {
-		gl.viewport(value.x, value.y, value.sx, value.sy);
+	function setViewport(x, y, sx, sy) {
+		gl.viewport(x, y, sx, sy);
 	}
 	function setDefaultViewport() {
 		gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -230,12 +229,15 @@ module.exports = function(canvas, debug) {
 	function setMaterialParameter(location, type, value) {
 		switch (type) {
 			case 0x8B50: // FLOAT_VEC2
+				assert.equal(value.length, 2);
 				gl.uniform2fv(location, value);
 				break;
 			case 0x8B51: // FLOAT_VEC3
+				assert.equal(value.length, 3);
 				gl.uniform3fv(location, value);
 				break;
 			case 0x8B52: // FLOAT_VEC4
+				assert.equal(value.length, 4);
 				gl.uniform4fv(location, value);
 				break;
 			case 0x8B53: // INT_VEC2
@@ -309,14 +311,14 @@ module.exports = function(canvas, debug) {
 	
 	function setProgramParameters(uniforms, parameters) {
 		FrameProfiler.start('SetParameters');
-		for (let paramName in parameters) {
+		for (let paramName in uniforms) {
 			let param = parameters[paramName];
-			if (paramName in uniforms) {
+			// if (paramName in uniforms) {
 				FrameProfiler.start('SetParam_' + paramName);
 				let info = uniforms[paramName];
 				setMaterialParameter(info.location, info.type, param);
 				FrameProfiler.stop();
-			}
+			// }
 		}
 		FrameProfiler.stop();
 	}
@@ -438,14 +440,14 @@ module.exports = function(canvas, debug) {
 	function renderDebugQuad(texture, x, y, sx, sy) {
 		setProgram(debugPrograms.textureCopy, { uTexture: {texture: texture, sampler: 0} });
 		setBlendMode(BlendMode.NONE);
-		setViewport({x: x, y: y, sx: sx, sy: sy});
+		setViewport(x, y, sx, sy);
 		renderScreenQuad(debugPrograms.textureCopy);
 	}
 
 	function renderDepthTexture(texture, x, y, sx, sy) {
 		setProgram(debugPrograms.depthTextureCopy, { uTexture: {texture: texture, sampler: 0} });
 		setBlendMode(BlendMode.NONE);
-		setViewport({x: x, y: y, sx: sx, sy: sy});
+		setViewport(x, y, sx, sy);
 		renderScreenQuad(debugPrograms.depthTextureCopy);
 	}
 

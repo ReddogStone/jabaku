@@ -39,4 +39,5 @@ void main() {
 	textureColor.a = uColor.a;
 	
 	gl_FragColor = textureColor;
+	// gl_FragColor = vec4(1, 1, 0, 1);
 }
