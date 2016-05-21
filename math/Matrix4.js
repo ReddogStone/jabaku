@@ -1,10 +1,14 @@
-var Matrix4 = (function() {
+module.exports = (function() {
 	'use strict';
 
 	var ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 	var EPSILON = 0.000001;
 
 	function Matrix4(m) {
+		if (!(this instanceof Matrix4)) {
+			return new Matrix4(m);
+		}
+
 		this.val = new ARRAY_TYPE(16);
 
 		if (m) { //assume Matrix4 with val

@@ -1,9 +1,13 @@
-var Matrix3 = (function() {
+module.exports = (function() {
 	'use strict';
 
 	var ARRAY_TYPE = typeof Float32Array !== "undefined" ? Float32Array : Array;
 
 	function Matrix3(m) {
+		if (!(this instanceof Matrix3)) {
+			return new Matrix3(m);
+		}
+
 		this.val = new ARRAY_TYPE(9);
 
 		if (m) { //assume Matrix3 with val
