@@ -1,7 +1,11 @@
-var Ray = (function() {
+module.exports = (function() {
 	'use strict';
 
 	function Ray(from, to) {
+		if (!(this instanceof Ray)) {
+			return new Ray(from, to);
+		}
+
 		this.from = from.clone();
 		this.to = to.clone();
 	}
