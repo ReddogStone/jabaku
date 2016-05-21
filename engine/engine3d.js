@@ -9,7 +9,7 @@ const BlendMode = require('./blend-mode');
 module.exports = function(canvas, debug) {
 	const WebGL = require('./webgl_utils')(debug);
 
-	let gl = WebGL.setupWebGL(canvas, {antialias: false}, [Extensions.DEPTH_TEXTURE, Extensions.STANDARD_DERIVATIVES]);
+	let gl = WebGL.setupWebGL(canvas, {antialias: true}, [Extensions.DEPTH_TEXTURE, Extensions.STANDARD_DERIVATIVES]);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.enable(gl.DEPTH_TEST);
 	gl.colorMask(true, true, true, true);

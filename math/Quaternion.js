@@ -1,3 +1,6 @@
+const Vector3 = require('./vector3');
+const Matrix3 = require('./matrix3');
+
 module.exports = (function() {
 	'use strict';
 
