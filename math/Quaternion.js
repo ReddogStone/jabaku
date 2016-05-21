@@ -1,4 +1,4 @@
-var Quaternion = (function() {
+module.exports = (function() {
 	'use strict';
 
 	//some shared 'private' arrays
@@ -12,6 +12,10 @@ var Quaternion = (function() {
 	var tmpMat3 = new Matrix3();
 
 	function Quaternion(x, y, z, w) {
+		if (!(this instanceof Quaternion)) {
+			return new Quaternion(x, y, z, w);
+		}
+
 		if (typeof x === "object") {
 			this.x = x.x||0;
 			this.y = x.y||0;
