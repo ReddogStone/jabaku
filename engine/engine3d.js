@@ -313,12 +313,12 @@ module.exports = function(canvas, debug) {
 		FrameProfiler.start('SetParameters');
 		for (let paramName in uniforms) {
 			let param = parameters[paramName];
-			// if (paramName in uniforms) {
+			if (paramName in parameters) {
 				FrameProfiler.start('SetParam_' + paramName);
 				let info = uniforms[paramName];
 				setMaterialParameter(info.location, info.type, param);
 				FrameProfiler.stop();
-			// }
+			}
 		}
 		FrameProfiler.stop();
 	}
