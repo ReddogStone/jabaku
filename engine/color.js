@@ -1,5 +1,8 @@
 'use strict';
 
+const assert = require('assert');
+const parseColor = require('parse-color');
+
 function mix(value1, value2, strength1, strength2) {
 	var strengthSum = strength1 + strength2;
 	if (strengthSum < 0.0000001) {
@@ -9,7 +12,14 @@ function mix(value1, value2, strength1, strength2) {
 }
 
 function Color(red, green, blue, alpha) {
-	return { red: red, green: green, blue: blue, alpha: alpha };
+	if (typeof red === 'string') {
+		return Color(parseColor(red).rgba.map((component, index) => (index < 3) ? component / 255.0 : component));
+	}
+	if (Array.isArray(red)) {
+		assert((red.length === 3) || (red.length === 4), `Wrong color input: ${red}`);
+		return { red: red[0], green: red[1], blue: red[2], alpha: red[3] || 1 };
+	}
+	return { red: red, green: green, blue: blue, alpha: alpha || 1 };
 };
 
 Color.clone = function(value) {
@@ -46,6 +56,9 @@ Color.equal = function(color1, color2) {
 		(color1.green == color2.green) &&
 		(color1.blue == color2.blue) &&
 		(color1.alpha == color2.alpha);
+};
+Color.random = function() {
+	return Color(Math.random(), Math.random(), Math.random(), 1);
 };
 
 module.exports = Color;
