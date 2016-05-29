@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = (function() {
 	'use strict';
 
@@ -719,6 +721,8 @@ module.exports = (function() {
 	Matrix4.lookAt = function(eye, target, up) {
 		return new Matrix4().lookAt(eye, target, up);
 	}
+
+	Matrix4.fromRotationTranslation = (...params) => Matrix4().fromRotationTranslation(...params);
 
 	return Matrix4;
 })();

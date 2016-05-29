@@ -1,3 +1,5 @@
+'use strict';
+
 const Vector3 = require('./vector3');
 const Matrix3 = require('./matrix3');
 
@@ -379,6 +381,8 @@ module.exports = (function() {
 	};
 
 	quat.str = quat.toString;
+
+	Quaternion.rotationTo = (...params) => Quaternion().rotationTo(...params);
 
 	return Quaternion;
 }) ();

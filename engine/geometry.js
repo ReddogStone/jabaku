@@ -20,6 +20,8 @@ function createQuadData() {
 }
 
 function createCylinderData(sides) {
+	sides = sides || 32;
+
 	let vertices = new Array(2 * 8 * (sides + 1));
 
 	let off = 0;
