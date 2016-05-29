@@ -1,3 +1,7 @@
+'use strict';
+
+const vec3 = require('../math/vector3');
+
 function createQuadData() {
 	return {
 		"vertices": [
@@ -16,13 +20,13 @@ function createQuadData() {
 }
 
 function createCylinderData(sides) {
-	var vertices = new Array(2 * 8 * (sides + 1));
+	let vertices = new Array(2 * 8 * (sides + 1));
 
-	var off = 0;
-	for (var i = 0; i < sides + 1; ++i) {
-		var angle = i * 2 * Math.PI / sides;
-		var s = Math.sin(angle);
-		var c = Math.cos(angle);
+	let off = 0;
+	for (let i = 0; i < sides + 1; ++i) {
+		let angle = i * 2 * Math.PI / sides;
+		let s = Math.sin(angle);
+		let c = Math.cos(angle);
 
 		vertices[off++] = 0.5 * c; vertices[off++] = 0.5 * s; vertices[off++] = 0.5; // top x, y, z
 		vertices[off++] = c; vertices[off++] = s; vertices[off++] = 0.0; // top nx, ny, nz
@@ -32,10 +36,10 @@ function createCylinderData(sides) {
 		vertices[off++] = i % 2; vertices[off++] = 1.0; // bottom tu, tv
 	}
 
-	var indices = new Array(3 * 2 * sides);
-	var off = 0;
-	for (var i = 0; i < sides; ++i) {
-		var indexOff = i * 2;
+	let indices = new Array(3 * 2 * sides);
+	off = 0;
+	for (let i = 0; i < sides; ++i) {
+		let indexOff = i * 2;
 		indices[off++] = indexOff; indices[off++] = indexOff + 1; indices[off++] = indexOff + 2;
 		indices[off++] = indexOff + 2; indices[off++] = indexOff + 1; indices[off++] = indexOff + 3;
 	}
@@ -104,11 +108,11 @@ function createCubeData() {
 }
 
 function subdividedSphereFace(vertices, indices, offsets, u, v, w, front, subdivisions) {
-	var off = offsets.vertex; var firstVertex = 0;
-	var startVertex = off / 8;
-	for (var i = 0; i < subdivisions + 2; ++i) {
-		for (var j = 0; j < subdivisions + 2; ++j) {
-			var pos = new Vector3();
+	let off = offsets.vertex; let firstVertex = 0;
+	let startVertex = off / 8;
+	for (let i = 0; i < subdivisions + 2; ++i) {
+		for (let j = 0; j < subdivisions + 2; ++j) {
+			let pos = vec3();
 			pos[u] = -0.5 + j / (subdivisions + 1);
 			pos[v] = 0.5 - i / (subdivisions + 1);
 			pos[w] = 0.5;
@@ -124,11 +128,11 @@ function subdividedSphereFace(vertices, indices, offsets, u, v, w, front, subdiv
 			vertices[off++] = j % 2; vertices[off++] = i % 2;
 		}
 	}
-	var idx = offsets.index;
-	for (var i = 0; i < subdivisions + 1; ++i) {
-		var row = startVertex + i * (subdivisions + 2);
-		var nextRow = startVertex + (i + 1) * (subdivisions + 2);
-		for (var j = 0; j < subdivisions + 1; ++j) {
+	let idx = offsets.index;
+	for (let i = 0; i < subdivisions + 1; ++i) {
+		let row = startVertex + i * (subdivisions + 2);
+		let nextRow = startVertex + (i + 1) * (subdivisions + 2);
+		for (let j = 0; j < subdivisions + 1; ++j) {
 			indices[idx++] = row + j;
 			indices[idx++] = row + j + 1;
 			indices[idx++] = nextRow + j;
@@ -143,10 +147,12 @@ function subdividedSphereFace(vertices, indices, offsets, u, v, w, front, subdiv
 }
 
 function createSphereData(subdivisions) {
-	var vertices = new Array(8 * 6 * (subdivisions + 2) * (subdivisions + 2));
-	var indices = new Array(6 * 2 * (subdivisions + 1) * (subdivisions + 1));
+	subdivisions = subdivisions || 10;
 
-	var offsets = {vertex: 0, index: 0};
+	let vertices = new Array(8 * 6 * (subdivisions + 2) * (subdivisions + 2));
+	let indices = new Array(6 * 2 * (subdivisions + 1) * (subdivisions + 1));
+
+	let offsets = {vertex: 0, index: 0};
 	subdividedSphereFace(vertices, indices, offsets, 'x', 'y', 'z', true, subdivisions);
 	subdividedSphereFace(vertices, indices, offsets, 'x', 'y', 'z', false, subdivisions);
 	subdividedSphereFace(vertices, indices, offsets, 'y', 'z', 'x', true, subdivisions);
