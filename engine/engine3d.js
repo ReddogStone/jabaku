@@ -455,6 +455,17 @@ module.exports = function(canvas, debug) {
 		setVertexBuffer(program, debugVb, debugDesc);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 	}
+
+	function readPixel(frameBuffer, x, y) {
+		setFrameBuffer(frameBuffer);
+
+		let buffer = new Uint8Array(4);
+		gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, buffer);
+
+		setFrameBuffer(null);
+
+		return buffer;
+	}
 	
 	return {
 		createVertexBufferWithSize: createVertexBufferWithSize,
@@ -494,6 +505,8 @@ module.exports = function(canvas, debug) {
 		renderScreenQuad: renderScreenQuad,
 		renderDebugQuad: renderDebugQuad,
 		renderDepthTexture: renderDepthTexture,
+
+		readPixel: readPixel,
 
 		getDrawingBufferSize: getDrawingBufferSize,
 		get gl() {

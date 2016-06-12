@@ -23,6 +23,7 @@ function calcFullDescription(description) {
 	return result;
 }
 
+// TODO: refactor to only need engine in the render function
 module.exports = function(engine3d) {
 	return {
 		make: function(data) {
