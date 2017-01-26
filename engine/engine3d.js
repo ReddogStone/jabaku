@@ -5,9 +5,10 @@ const assert = require('assert');
 const Extensions = require('./webgl-extensions');
 const FrameProfiler = require('../profiler/profiler');
 const BlendMode = require('./blend-mode');
+const WebGLUtils = require('./webgl_utils');
 
 module.exports = function(canvas, debug) {
-	const WebGL = require('./webgl_utils')(debug);
+	const WebGL = WebGLUtils(debug);
 
 	let gl = WebGL.setupWebGL(canvas, {antialias: true}, [Extensions.DEPTH_TEXTURE, Extensions.STANDARD_DERIVATIVES]);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
