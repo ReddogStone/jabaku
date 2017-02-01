@@ -512,6 +512,10 @@ module.exports = function(canvas, debug) {
 		getDrawingBufferSize: getDrawingBufferSize,
 		get gl() {
 			return gl;
+		},
+
+		get canvas() {
+			return canvas;
 		}
 	};
 };
