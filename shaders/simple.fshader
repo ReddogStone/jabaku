@@ -34,10 +34,12 @@ void main() {
 	vec3 diffuse = diffuse1 + diffuse2;
 	vec3 specular = (specular1/* + specular2*/) * white;
 
-	textureColor.rgb *= (specular + (diffuse + uAmbient) * uColor.rgb) * uColor.a;
-	textureColor.rgb += uColor.rgb * uLuminosity * textureColor.a * uColor.a;
-	textureColor.a = uColor.a;
+	vec3 light = (specular + (diffuse + uAmbient) * uColor.rgb) * uColor.a;
+
+	textureColor.rgb = textureColor.rgb * light + textureColor.rgb * uLuminosity;
+	// textureColor.rgb += uColor.rgb * uLuminosity * textureColor.a * uColor.a;
+	textureColor.a *= uColor.a;
 	
 	gl_FragColor = textureColor;
-	// gl_FragColor = vec4(1, 1, 0, 1);
+	// gl_FragColor = vec4(1, 1, 0, 0.5);
 }
